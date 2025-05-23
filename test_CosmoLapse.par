@@ -1,0 +1,233 @@
+######################################
+# Run Time
+######################################
+ActiveThorns = "Time"
+
+Cactus::cctk_initial_time = 1
+Cactus::cctk_final_time   = 1.2
+Cactus::terminate         = "time"
+# dtfac is default and overwritten by ICPertFLRW_GRH
+
+######################################
+# Grid
+######################################
+ActiveThorns = "CartGrid3D CoordBase Slab SymBase PeriodicCarpet SpaceMask CoordGauge"
+ActiveThorns = "Carpet CarpetLib CarpetInterp CarpetReduce CarpetSlab"
+
+CoordBase::domainsize = "minmax"
+CoordBase::xmin = -603.0
+CoordBase::ymin = -603.0
+CoordBase::zmin = -603.0
+CoordBase::xmax = +603.0
+CoordBase::ymax = +603.0
+CoordBase::zmax = +603.0
+CoordBase::dx = 37.6875
+CoordBase::dy = 37.6875
+CoordBase::dz = 37.6875
+
+CoordBase::boundary_size_x_lower     = 3
+CoordBase::boundary_size_y_lower     = 3
+CoordBase::boundary_size_z_lower     = 3
+CoordBase::boundary_size_x_upper     = 3
+CoordBase::boundary_size_y_upper     = 3
+CoordBase::boundary_size_z_upper     = 3
+
+CoordBase::boundary_shiftout_x_lower = 1
+CoordBase::boundary_shiftout_y_lower = 1
+CoordBase::boundary_shiftout_z_lower = 1
+CoordBase::boundary_shiftout_x_upper = 0
+CoordBase::boundary_shiftout_y_upper = 0
+CoordBase::boundary_shiftout_z_upper = 0
+
+CartGrid3D::type = "coordbase"
+PeriodicCarpet::periodic = "yes"
+SpaceMask::use_mask = "yes"
+
+Carpet::init_fill_timelevels     = "yes"
+Carpet::poison_new_timelevels    = yes
+Carpet::domain_from_coordbase    = yes
+driver::ghost_size               = 3
+Carpet::use_buffer_zones         = yes
+Carpet::prolongation_order_space = 5
+CarpetLib::poison_new_memory     = yes
+CarpetLib::max_allowed_memory_MB = 12288
+Carpet::grid_structure_filename   = "grid_structure.asc"
+Carpet::grid_coordinates_filename = "grid_coordinates.asc"
+
+#####################################
+# Spacetime IC
+#####################################
+ActiveThorns = "InitBase ICPertFLRW_GRH"
+ActiveThorns = "ADMBase ADMMacros ADMCoupling StaticConformal"
+
+InitBase::initial_data_setup_method = "init_some_levels"
+ADMBase::metric_type     = "physical"
+ADMBase::initial_data    = "ICPertFLRW_GRH"
+
+ICPertFLRW_GRH::ICPertFLRW_GRH_Amp_x[0] = -0.0001
+ICPertFLRW_GRH::ICPertFLRW_GRH_Amp_y[0] = -0.0001
+ICPertFLRW_GRH::ICPertFLRW_GRH_Amp_z[0] = -0.0001
+ICPertFLRW_GRH::ICPertFLRW_GRH_lambda_x[0] = 1206.0
+ICPertFLRW_GRH::ICPertFLRW_GRH_lambda_y[0] = 1206.0
+ICPertFLRW_GRH::ICPertFLRW_GRH_lambda_z[0] = 1206.0
+
+#####################################
+# Hydrodynamics IC
+#####################################
+ActiveThorns = "HydroBase TmunuBase EOS_Omni"
+
+HydroBase::initial_hydro = "ICPertFLRW_GRH"
+HydroBase::evolution_method = "GRHydro"
+
+TmunuBase::stress_energy_storage = "yes"
+TmunuBase::stress_energy_at_RHS  = "yes"
+TmunuBase::prolongation_type     = none
+
+EOS_Omni::poly_k     = 1.e-50
+EOS_Omni::poly_gamma = 2.0
+
+######################################
+# Evolution Spacetime
+######################################
+ActiveThorns = "MoL ML_BSSN ML_BSSN_Helper"
+ActiveThorns = "AEILocalInterp GenericFD LocalReduce LoopControl"
+
+MoL::ODE_Method             = "RK4"
+MoL::MoL_Intermediate_Steps = 4
+MoL::MoL_Num_Scratch_Levels = 1
+
+ADMMacros::spatial_order   = 4
+ADMBase::evolution_method  = "ML_BSSN"
+
+# for Mesh Refinement interpolation
+Carpet::prolongation_order_time = 2 
+# time interpolation order needs to be 1 less than timelevels
+ADMBase::metric_timelevels = 3
+ADMBase::lapse_timelevels  = 3
+ADMBase::shift_timelevels  = 3
+ML_BSSN::timelevels        = 3
+TmunuBase::timelevels      = 3
+HydroBase::timelevels      = 3
+
+#----------------------------------
+#      Gauge
+#----------------------------------
+ActiveThorns = "CosmoLapse"
+
+ADMBase::lapse_evolution_method = "ML_BSSN"
+ADMBase::shift_evolution_method = "ML_BSSN"
+ADMBase::dtlapse_evolution_method = "ML_BSSN"
+ADMBase::dtshift_evolution_method = "ML_BSSN"
+
+ADMBase::initial_lapse = "one"
+ADMBase::initial_shift = "zero"
+ADMBase::initial_dtlapse = "zero"
+ADMBase::initial_dtshift = "zero"
+
+# Alpha evolution equation
+# shock avoiding
+CosmoLapse::fBMa = 1.0  # default 0
+CosmoLapse::fBMb = 1.0  # default 0
+CosmoLapse::fBMc = -2  # default 0
+# K - Kth
+CosmoLapse::KaExpression = 0 # default 0
+CosmoLapse::KbExpression = 1 # default 0
+CosmoLapse::KcExpression = 0 # default 0
+CosmoLapse::alphaFullLieDeriv = 1 #0:no, 1:yes, default 0
+
+# Beta evolution equation
+CosmoLapse::betaXi = 0.75 # default 0
+CosmoLapse::betaEta = 1.0 # default 0
+CosmoLapse::betaP = 2 # default 1
+CosmoLapse::betaFullLieDeriv = 1 #0:no, 1:yes, default 0
+
+######################################
+# Evolution Hydrodynamics
+######################################
+ActiveThorns = "GRHydro"
+
+GRHydro::riemann_solver        = "HLLE"
+GRHydro::GRHydro_eos_type      = "Polytype"
+GRHydro::GRHydro_eos_table     = "2D_Polytrope"
+GRHydro::recon_method          = "ppm"
+GRHydro::ppm_detect            = yes
+GRHydro::GRHydro_stencil       = 3
+GRHydro::bound                 = "none"
+GRHydro::rho_abs_min           = 1.e-30 
+# don't forget to turn off atmosphere
+GRHydro::sources_spatial_order = 4
+GRHydro::GRHydro_enable_internal_excision = "false"
+
+######################################
+# Output
+######################################
+ActiveThorns = "CarpetIOBasic CarpetIOScalar CarpetIOASCII CarpetIOHDF5 NaNChecker"
+IO::out_dir = $parfile
+IO::out_unchunked = "no"
+
+IOHDF5::checkpoint                  = yes
+IO::checkpoint_dir                  = $parfile
+IO::checkpoint_ID                   = yes
+IO::checkpoint_every_walltime_hours = 2
+IO::checkpoint_on_terminate         = yes
+IO::recover     = "autoprobe"
+IO::recover_dir = $parfile
+
+NaNChecker::check_every = 10
+NaNChecker::action_if_found = "terminate"
+NaNChecker::check_vars = "
+       ADMBase::metric
+       ADMBase::curv
+       ADMBase::lapse
+       ADMBase::shift
+       HydroBase::rho
+       TmunuBase::eTtt
+"
+
+# print in stdout
+IOBasic::outInfo_every      = 1
+IOBasic::outInfo_reductions = "minimum maximum"
+IOBasic::outInfo_vars       = "
+       ADMBase::lapse
+       HydroBase::rho
+       ML_BSSN::ML_Ham
+       CosmoLapse::propertime
+"
+
+# print ascii file of var reduction
+IOScalar::one_file_per_group = yes
+IOScalar::outScalar_every = 1
+IOScalar::outScalar_reductions = "average"
+IOScalar::outScalar_vars  = "
+       ADMBase::metric
+       ADMBase::curv
+       ADMBase::lapse
+       ADMBase::shift
+       ML_BSSN::ML_Ham
+       ML_BSSN::ML_Mom
+       HydroBase::rho
+       HydroBase::press
+"
+
+# record the grid point values of a given plane
+IOASCII::one_file_per_group = yes
+IOASCII::out1D_every = 0
+IOASCII::out1D_vars  = ""
+
+# record box values
+IOHDF5::out_criterion = "divisor"
+IOHDF5::out_every          = 100
+IOHDF5::one_file_per_group = yes
+IOHDF5::compression_level  = 0
+IOHDF5::out_vars  = "
+        ADMBase::metric
+        ADMBase::curv
+        ADMBase::lapse
+        ADMBase::shift
+        ADMBase::dtlapse
+        ADMBase::dtshift
+        HydroBase::rho
+        HydroBase::vel
+        HydroBase::w_lorentz
+        CosmoLapse::propertime
+"

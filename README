@@ -1,0 +1,134 @@
+Cactus Code Thorns CosmoThorn
+Author(s)    : Robyn L. Munoz
+Maintainer(s): Robyn L. Munoz
+Licence      : GNU General Public License
+--------------------------------------------------------------------------
+
+Purpose of CosmoLapse
+=====================
+This thorn calculates and provides
+
+proper time
+-----------
+
+starting from tau = code time
+ >> d(tau)/dt = (alpha^2 - beta^i beta^j g_{ij})^(1/2)
+
+gauge
+-----
+
+ *** Lapse
+fBM = fBMa + fBMb alpha^fBMc
+Ka = [K, 
+      ((LnExp[expterm] / KaSteepness) 
+       + (KaTransition / ( 1 + Exp[-expterm])))]
+with expterm = KaSteepness * (K - KaTransition)
+Kb = [0, Kth]
+Kc = [1, -Kth]
+with Kth = - 2.0 / (tau (1 + eosw)) 
+and eosw = press / (rho (1 + eps)) using terms from HydroBase
+ >> d(alpha)/dt = (- alpha^2 fBM (Ka - Kb) / Kc)
+The user chooses:
+int: fBMc
+rel: fBMa, fBMb, KaSteepness, KaTransition
+choice: KaExpression, KbExpression, KcExpression
+
+ *** Shift
+ >> d(beta^i)/dt = B^i
+ >> d(B^i)/dt = (betaXi alpha^betaP d(Xt^i)/dt - betaEta beta^i),
+The user chooses:
+int: betaP
+real: betaXi, betaEta
+
+The user can include the Lie derivative along the shift vector term
+ >> d()/dt = ... + lie
+The user chooses:
+alphaFullLieDeriv and/or betaFullLieDeriv
+to be 0 "exclude lie term" or 1 "include lie term"
+
+Copyright
+=========
+Copyright (C) 2025  Robyn L. Munoz
+
+This thorn is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This thorn is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this thorn.  If not, see <http://www.gnu.org/licenses/>.
+
+You may contact the author at : r.l.munoz@sussex.ac.uk
+
+How to implement this thorn into Einstein Toolkit:
+==================================================
+===== 1) Have a working version of Einstein Toolkit
+# Follow the instructions here
+# https://github.com/nds-org/jupyter-et/blob/master/tutorial-server/notebooks/CactusTutorial.ipynb
+# Don't forget to try to run HelloWorld
+
+#If you're doing this on an HPC
+>> cd pathtocactus
+>> ./simfactory/bin/sim setup-silent --machine=HPCname
+>> ./simfactory/bin/sim build --machine=HPCname --thornlist=thornlists/einsteintoolkit.th
+
+#The paths of the HPC config files are:
+# pathtocactus/simfactory/mdb/machines/HPCname.ini
+# pathtocactus/simfactory/mdb/optionlists/HPCname.cfg
+# pathtocactus/simfactory/mdb/runscripts/HPCname.run
+# pathtocactus/simfactory/mdb/submitscripts/HPCname.sub
+
+===== 2) Include CosmoLapse in Einstein Toolkit
+# link
+>> cd path_to_Cactus/Cactus/arrangements/EinsteinEvolve/
+>> ln -s path_to_thorn/CosmoThorn/CosmoLapse .
+# add to Cactus/thornlists/einsteintoolkit.th, in EinsteinEvolve section
+EinsteinEvolve/CosmoLapse
+
+===== 3) Compile Einstein Toolkit
+# in Cactus directory
+>> ./simfactory/bin/sim build -j2 --thornlist=thornlists/einsteintoolkit.th
+# Or
+>> ./simfactory/bin/sim build --machine=HPCname --thornlist=thornlists/einsteintoolkit.th
+
+===== 4) Run test_CosmoLapse.par to check if it works
+>> ./simfactory/bin/sim create-submit test_CosmoLapse --parfile=path/to/CosmoThorn/test_CosmoLapse.par --procs=1 --num-threads=1
+# Or
+>> ./simfactory/bin/sim create-submit test_CosmoLapse --machine=HPCname --parfile=path/to/CosmoThorn/test_CosmoLapse.par --procs=1 --num-threads=1
+eventhough the example uses ICPertFLRW_GRH, this is not a requirement
+
+===== 5) Check output
+with
+ >> tail -30 ~/simulations/test_CosmoLapse/output-0000/test_CosmoLapse.out
+you should get:
+-----------------------------------------------------------------------------------------------------------------------------------
+Iteration      Time |              ADMBASE::alp |           COSMOLAPSE::tau |            HYDROBASE::rho |                ML_BSSN::H
+                    |      minimum      maximum |      minimum      maximum |      minimum      maximum |      minimum      maximum
+-----------------------------------------------------------------------------------------------------------------------------------
+        0     1.000 |    1.0000000    1.0000000 |    1.0000000    1.0000000 |    0.0530351    0.0530682 |   -0.0000001    0.0000001
+        1     1.018 |    0.9999924    1.0000076 |    1.0182539    1.0182541 |    0.0511504    0.0511828 |   -0.0000001    0.0000001
+        2     1.037 |    0.9999849    1.0000151 |    1.0365077    1.0365083 |    0.0493644    0.0493961 |   -0.0000001    0.0000001
+        3     1.055 |    0.9999774    1.0000226 |    1.0547613    1.0547626 |    0.0476704    0.0477014 |   -0.0000001    0.0000001
+        4     1.073 |    0.9999700    1.0000300 |    1.0730149    1.0730171 |    0.0460621    0.0460924 |   -0.0000001    0.0000001
+        5     1.091 |    0.9999627    1.0000374 |    1.0912682    1.0912717 |    0.0445337    0.0445635 |   -0.0000002    0.0000001
+        6     1.110 |    0.9999554    1.0000447 |    1.1095215    1.1095264 |    0.0430802    0.0431095 |   -0.0000003    0.0000002
+        7     1.128 |    0.9999482    1.0000519 |    1.1277746    1.1277813 |    0.0416967    0.0417255 |   -0.0000004    0.0000002
+        8     1.146 |    0.9999410    1.0000590 |    1.1460276    1.1460363 |    0.0403788    0.0404070 |   -0.0000005    0.0000002
+        9     1.164 |    0.9999339    1.0000661 |    1.1642804    1.1642914 |    0.0391224    0.0391502 |   -0.0000005    0.0000003
+       10     1.183 |    0.9999270    1.0000731 |    1.1825331    1.1825467 |    0.0379237    0.0379510 |   -0.0000006    0.0000003
+       11     1.201 |    0.9999200    1.0000800 |    1.2007857    1.2008020 |    0.0367792    0.0368062 |   -0.0000006    0.0000004
+INFO (Carpet): Terminating due to cctk_final_time at t = 1.200794
+
+===== 6) Be happy
+
+===== 7) Modifying CosmoLapse
+Should you wish to modify the code, please change the CosmoLapse.m file.
+Update Makefile to include path to your Kranc installation.
+ >> make CosmoLapse
+Don't forget to recompile Einstein Toolkit
+ >> ./simfactory/bin/sim build -j2 --thornlist=thornlists/einsteintoolkit.th

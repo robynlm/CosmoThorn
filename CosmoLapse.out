@@ -1,0 +1,34 @@
+Using Kranc installation at /Users/rlm36AA/codes/ET/ET_2023_11/Cactus/repos/Kranc/Bin/..
+Mathematica 13.3.1 Kernel for Mac OS X ARM (64-bit)
+Copyright 1988-2023 Wolfram Research, Inc.
+Profiling disabled
+Creating thorn CosmoLapse
+Processing tensorial arguments
+Computing reflection symmetries
+Creating (component-based) Kranc thorn
+Processing arguments to CreateKrancThorn
+Verifying arguments
+Creating MoL registration file
+Creating symmetry registration file
+Creating differencing header file
+Creating startup file
+Creating configuration file
+Creating interface file
+Creating param file
+Creating schedule file
+Creating calculation source files
+Creating calculation function: CosmoLapse_dtLapsePostStep
+Creating calculation function: CosmoLapse_dtLapsePostRHS
+Creating calculation function: CosmoLapse_dtLapsePostStepBoundary
+Creating calculation function: CosmoLapse_dtLapsePostRHSBoundary
+Creating calculation function: CosmoLapse_dtShiftPostStep
+Creating calculation function: CosmoLapse_dtShiftPostRHS
+Creating calculation function: CosmoLapse_dtShiftPostStepBoundary
+Creating calculation function: CosmoLapse_dtShiftPostRHSBoundary
+Creating calculation function: CosmoLapse_InitialTau
+Creating calculation function: CosmoLapse_InitRHSTau
+Creating calculation function: CosmoLapse_RHSTau
+Creating make file
+Creating thorn
+Creating thorns in directory ./CosmoLapse
+Thorn ./CosmoLapse created successfully
