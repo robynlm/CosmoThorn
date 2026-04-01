@@ -2,6 +2,10 @@
 
 STORAGE: propertime[timelevels]
 
+STORAGE: Kthreshold[timelevels]
+
+STORAGE: Kthresholdrhs[rhs_timelevels]
+
 STORAGE: propertimerhs[rhs_timelevels]
 schedule CosmoLapse_Startup at STARTUP
 {
@@ -19,6 +23,12 @@ schedule CosmoLapse_dtLapsePostStep IN MoL_PostStep AFTER ML_BSSN_ADMBaseBoundar
 {
   LANG: C
   READS: ADMBase::alp(Everywhere)
+  READS: ADMBase::gxx(Everywhere)
+  READS: ADMBase::gxy(Everywhere)
+  READS: ADMBase::gxz(Everywhere)
+  READS: ADMBase::gyy(Everywhere)
+  READS: ADMBase::gyz(Everywhere)
+  READS: ADMBase::gzz(Everywhere)
   READS: ADMBase::betax(Everywhere)
   READS: ADMBase::betay(Everywhere)
   READS: ADMBase::betaz(Everywhere)
@@ -35,15 +45,23 @@ schedule CosmoLapse_dtLapsePostStep IN MoL_PostStep AFTER ML_BSSN_ADMBaseBoundar
   READS: ML_BSSN::Xt2rhs(Everywhere)
   READS: ML_BSSN::Xt3rhs(Everywhere)
   READS: ML_BSSN::trK(Everywhere)
+  READS: CosmoLapse::Ktransition(Everywhere)
   READS: CosmoLapse::tau(Everywhere)
   WRITES: ML_BSSN::alpharhs(Interior)
   WRITES: ADMBase::dtalp(Interior)
+  WRITES: CosmoLapse::Ktransition(Interior)
 } "CosmoLapse_dtLapsePostStep"
 
 schedule CosmoLapse_dtLapsePostRHS IN MoL_PostRHS
 {
   LANG: C
   READS: ADMBase::alp(Everywhere)
+  READS: ADMBase::gxx(Everywhere)
+  READS: ADMBase::gxy(Everywhere)
+  READS: ADMBase::gxz(Everywhere)
+  READS: ADMBase::gyy(Everywhere)
+  READS: ADMBase::gyz(Everywhere)
+  READS: ADMBase::gzz(Everywhere)
   READS: ADMBase::betax(Everywhere)
   READS: ADMBase::betay(Everywhere)
   READS: ADMBase::betaz(Everywhere)
@@ -60,33 +78,45 @@ schedule CosmoLapse_dtLapsePostRHS IN MoL_PostRHS
   READS: ML_BSSN::Xt2rhs(Everywhere)
   READS: ML_BSSN::Xt3rhs(Everywhere)
   READS: ML_BSSN::trK(Everywhere)
+  READS: CosmoLapse::Ktransition(Everywhere)
   READS: CosmoLapse::tau(Everywhere)
   WRITES: ML_BSSN::alpharhs(Interior)
   WRITES: ADMBase::dtalp(Interior)
+  WRITES: CosmoLapse::Ktransition(Interior)
 } "CosmoLapse_dtLapsePostRHS"
 
 schedule CosmoLapse_dtLapsePostStepBoundary IN MoL_PostStep AFTER CosmoLapse_dtLapsePostStep
 {
   LANG: C
   SYNC: ADMBase::dtlapse
+  SYNC: Kthreshold
   SYNC: ML_BSSN::ML_lapserhs
   WRITES: ML_BSSN::alpharhs(Boundary)
   WRITES: ADMBase::dtalp(Boundary)
+  WRITES: CosmoLapse::Ktransition(Boundary)
 } "CosmoLapse_dtLapsePostStepBoundary"
 
 schedule CosmoLapse_dtLapsePostRHSBoundary IN MoL_PostRHS AFTER CosmoLapse_dtLapsePostRHS
 {
   LANG: C
   SYNC: ADMBase::dtlapse
+  SYNC: Kthreshold
   SYNC: ML_BSSN::ML_lapserhs
   WRITES: ML_BSSN::alpharhs(Boundary)
   WRITES: ADMBase::dtalp(Boundary)
+  WRITES: CosmoLapse::Ktransition(Boundary)
 } "CosmoLapse_dtLapsePostRHSBoundary"
 
 schedule CosmoLapse_dtShiftPostStep IN MoL_PostStep AFTER ML_BSSN_ADMBaseBoundaryScalar BEFORE ADMBase_SetADMVars
 {
   LANG: C
   READS: ADMBase::alp(Everywhere)
+  READS: ADMBase::gxx(Everywhere)
+  READS: ADMBase::gxy(Everywhere)
+  READS: ADMBase::gxz(Everywhere)
+  READS: ADMBase::gyy(Everywhere)
+  READS: ADMBase::gyz(Everywhere)
+  READS: ADMBase::gzz(Everywhere)
   READS: ADMBase::betax(Everywhere)
   READS: ADMBase::betay(Everywhere)
   READS: ADMBase::betaz(Everywhere)
@@ -103,6 +133,7 @@ schedule CosmoLapse_dtShiftPostStep IN MoL_PostStep AFTER ML_BSSN_ADMBaseBoundar
   READS: ML_BSSN::Xt2rhs(Everywhere)
   READS: ML_BSSN::Xt3rhs(Everywhere)
   READS: ML_BSSN::trK(Everywhere)
+  READS: CosmoLapse::Ktransition(Everywhere)
   READS: CosmoLapse::tau(Everywhere)
   WRITES: ML_BSSN::B1rhs(Interior)
   WRITES: ML_BSSN::B2rhs(Interior)
@@ -119,6 +150,12 @@ schedule CosmoLapse_dtShiftPostRHS IN MoL_PostRHS
 {
   LANG: C
   READS: ADMBase::alp(Everywhere)
+  READS: ADMBase::gxx(Everywhere)
+  READS: ADMBase::gxy(Everywhere)
+  READS: ADMBase::gxz(Everywhere)
+  READS: ADMBase::gyy(Everywhere)
+  READS: ADMBase::gyz(Everywhere)
+  READS: ADMBase::gzz(Everywhere)
   READS: ADMBase::betax(Everywhere)
   READS: ADMBase::betay(Everywhere)
   READS: ADMBase::betaz(Everywhere)
@@ -135,6 +172,7 @@ schedule CosmoLapse_dtShiftPostRHS IN MoL_PostRHS
   READS: ML_BSSN::Xt2rhs(Everywhere)
   READS: ML_BSSN::Xt3rhs(Everywhere)
   READS: ML_BSSN::trK(Everywhere)
+  READS: CosmoLapse::Ktransition(Everywhere)
   READS: CosmoLapse::tau(Everywhere)
   WRITES: ML_BSSN::B1rhs(Interior)
   WRITES: ML_BSSN::B2rhs(Interior)
@@ -184,12 +222,14 @@ schedule CosmoLapse_dtShiftPostRHSBoundary IN MoL_PostRHS AFTER CosmoLapse_dtShi
 schedule CosmoLapse_InitialTau AT initial after ML_BSSN_InitialADMBase1Everywhere
 {
   LANG: C
+  WRITES: CosmoLapse::Ktransition(Everywhere)
   WRITES: CosmoLapse::tau(Everywhere)
 } "CosmoLapse_InitialTau"
 
 schedule CosmoLapse_InitRHSTau AT analysis BEFORE CosmoLapse_RHSTau
 {
   LANG: C
+  WRITES: CosmoLapse::Ktransitionrhs(Everywhere)
   WRITES: CosmoLapse::taurhs(Everywhere)
 } "CosmoLapse_InitRHSTau"
 
@@ -206,6 +246,7 @@ schedule CosmoLapse_RHSTau IN MoL_CalcRHS
   READS: ADMBase::betax(Everywhere)
   READS: ADMBase::betay(Everywhere)
   READS: ADMBase::betaz(Everywhere)
+  WRITES: CosmoLapse::Ktransitionrhs(Everywhere)
   WRITES: CosmoLapse::taurhs(Everywhere)
 } "CosmoLapse_RHSTau"
 
@@ -214,6 +255,7 @@ schedule CosmoLapse_SelectBoundConds in MoL_PostStep
   LANG: C
   OPTIONS: level
   SYNC: propertime
+  SYNC: Kthreshold
 } "select boundary conditions"
 
 schedule CosmoLapse_CheckBoundaries at BASEGRID

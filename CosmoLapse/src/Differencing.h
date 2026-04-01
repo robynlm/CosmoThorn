@@ -574,3 +574,291 @@ static CCTK_REAL PDstandardNthfdOrder832_impl(const CCTK_REAL* restrict const u,
 }
 #endif
 
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder21(u) ((6*KRANC_GFOFFSET3D(u,0,0,0) - 4*(KRANC_GFOFFSET3D(u,-1,0,0) + KRANC_GFOFFSET3D(u,1,0,0)) + KRANC_GFOFFSET3D(u,-2,0,0) + KRANC_GFOFFSET3D(u,2,0,0))*pm1o4dx)
+#else
+#  define PDupwindNthSymmfdOrder21(u) (PDupwindNthSymmfdOrder21_impl(u,pm1o4dx,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder21_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o4dx, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder21_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o4dx, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (6*KRANC_GFOFFSET3D(u,0,0,0) - 4*(KRANC_GFOFFSET3D(u,-1,0,0) + KRANC_GFOFFSET3D(u,1,0,0)) + KRANC_GFOFFSET3D(u,-2,0,0) + KRANC_GFOFFSET3D(u,2,0,0))*pm1o4dx;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder22(u) ((6*KRANC_GFOFFSET3D(u,0,0,0) - 4*(KRANC_GFOFFSET3D(u,0,-1,0) + KRANC_GFOFFSET3D(u,0,1,0)) + KRANC_GFOFFSET3D(u,0,-2,0) + KRANC_GFOFFSET3D(u,0,2,0))*pm1o4dy)
+#else
+#  define PDupwindNthSymmfdOrder22(u) (PDupwindNthSymmfdOrder22_impl(u,pm1o4dy,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder22_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o4dy, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder22_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o4dy, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (6*KRANC_GFOFFSET3D(u,0,0,0) - 4*(KRANC_GFOFFSET3D(u,0,-1,0) + KRANC_GFOFFSET3D(u,0,1,0)) + KRANC_GFOFFSET3D(u,0,-2,0) + KRANC_GFOFFSET3D(u,0,2,0))*pm1o4dy;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder23(u) ((6*KRANC_GFOFFSET3D(u,0,0,0) - 4*(KRANC_GFOFFSET3D(u,0,0,-1) + KRANC_GFOFFSET3D(u,0,0,1)) + KRANC_GFOFFSET3D(u,0,0,-2) + KRANC_GFOFFSET3D(u,0,0,2))*pm1o4dz)
+#else
+#  define PDupwindNthSymmfdOrder23(u) (PDupwindNthSymmfdOrder23_impl(u,pm1o4dz,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder23_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o4dz, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder23_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o4dz, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return PDupwindNthSymmfdOrder22_impl(u, pm1o4dz, cdk, cdj);
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder41(u) ((-20*KRANC_GFOFFSET3D(u,0,0,0) + 15*(KRANC_GFOFFSET3D(u,-1,0,0) + KRANC_GFOFFSET3D(u,1,0,0)) - 6*(KRANC_GFOFFSET3D(u,-2,0,0) + KRANC_GFOFFSET3D(u,2,0,0)) + KRANC_GFOFFSET3D(u,-3,0,0) + KRANC_GFOFFSET3D(u,3,0,0))*p1o24dx)
+#else
+#  define PDupwindNthSymmfdOrder41(u) (PDupwindNthSymmfdOrder41_impl(u,p1o24dx,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder41_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dx, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder41_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dx, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-20*KRANC_GFOFFSET3D(u,0,0,0) + 15*(KRANC_GFOFFSET3D(u,-1,0,0) + KRANC_GFOFFSET3D(u,1,0,0)) - 6*(KRANC_GFOFFSET3D(u,-2,0,0) + KRANC_GFOFFSET3D(u,2,0,0)) + KRANC_GFOFFSET3D(u,-3,0,0) + KRANC_GFOFFSET3D(u,3,0,0))*p1o24dx;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder42(u) ((-20*KRANC_GFOFFSET3D(u,0,0,0) + 15*(KRANC_GFOFFSET3D(u,0,-1,0) + KRANC_GFOFFSET3D(u,0,1,0)) - 6*(KRANC_GFOFFSET3D(u,0,-2,0) + KRANC_GFOFFSET3D(u,0,2,0)) + KRANC_GFOFFSET3D(u,0,-3,0) + KRANC_GFOFFSET3D(u,0,3,0))*p1o24dy)
+#else
+#  define PDupwindNthSymmfdOrder42(u) (PDupwindNthSymmfdOrder42_impl(u,p1o24dy,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder42_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dy, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder42_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dy, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-20*KRANC_GFOFFSET3D(u,0,0,0) + 15*(KRANC_GFOFFSET3D(u,0,-1,0) + KRANC_GFOFFSET3D(u,0,1,0)) - 6*(KRANC_GFOFFSET3D(u,0,-2,0) + KRANC_GFOFFSET3D(u,0,2,0)) + KRANC_GFOFFSET3D(u,0,-3,0) + KRANC_GFOFFSET3D(u,0,3,0))*p1o24dy;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder43(u) ((-20*KRANC_GFOFFSET3D(u,0,0,0) + 15*(KRANC_GFOFFSET3D(u,0,0,-1) + KRANC_GFOFFSET3D(u,0,0,1)) - 6*(KRANC_GFOFFSET3D(u,0,0,-2) + KRANC_GFOFFSET3D(u,0,0,2)) + KRANC_GFOFFSET3D(u,0,0,-3) + KRANC_GFOFFSET3D(u,0,0,3))*p1o24dz)
+#else
+#  define PDupwindNthSymmfdOrder43(u) (PDupwindNthSymmfdOrder43_impl(u,p1o24dz,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder43_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dz, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder43_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dz, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return PDupwindNthSymmfdOrder42_impl(u, p1o24dz, cdk, cdj);
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder61(u) ((70*KRANC_GFOFFSET3D(u,0,0,0) - 56*(KRANC_GFOFFSET3D(u,-1,0,0) + KRANC_GFOFFSET3D(u,1,0,0)) + 28*(KRANC_GFOFFSET3D(u,-2,0,0) + KRANC_GFOFFSET3D(u,2,0,0)) - 8*(KRANC_GFOFFSET3D(u,-3,0,0) + KRANC_GFOFFSET3D(u,3,0,0)) + KRANC_GFOFFSET3D(u,-4,0,0) + KRANC_GFOFFSET3D(u,4,0,0))*pm1o120dx)
+#else
+#  define PDupwindNthSymmfdOrder61(u) (PDupwindNthSymmfdOrder61_impl(u,pm1o120dx,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder61_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o120dx, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder61_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o120dx, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (70*KRANC_GFOFFSET3D(u,0,0,0) - 56*(KRANC_GFOFFSET3D(u,-1,0,0) + KRANC_GFOFFSET3D(u,1,0,0)) + 28*(KRANC_GFOFFSET3D(u,-2,0,0) + KRANC_GFOFFSET3D(u,2,0,0)) - 8*(KRANC_GFOFFSET3D(u,-3,0,0) + KRANC_GFOFFSET3D(u,3,0,0)) + KRANC_GFOFFSET3D(u,-4,0,0) + KRANC_GFOFFSET3D(u,4,0,0))*pm1o120dx;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder62(u) ((70*KRANC_GFOFFSET3D(u,0,0,0) - 56*(KRANC_GFOFFSET3D(u,0,-1,0) + KRANC_GFOFFSET3D(u,0,1,0)) + 28*(KRANC_GFOFFSET3D(u,0,-2,0) + KRANC_GFOFFSET3D(u,0,2,0)) - 8*(KRANC_GFOFFSET3D(u,0,-3,0) + KRANC_GFOFFSET3D(u,0,3,0)) + KRANC_GFOFFSET3D(u,0,-4,0) + KRANC_GFOFFSET3D(u,0,4,0))*pm1o120dy)
+#else
+#  define PDupwindNthSymmfdOrder62(u) (PDupwindNthSymmfdOrder62_impl(u,pm1o120dy,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder62_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o120dy, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder62_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o120dy, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (70*KRANC_GFOFFSET3D(u,0,0,0) - 56*(KRANC_GFOFFSET3D(u,0,-1,0) + KRANC_GFOFFSET3D(u,0,1,0)) + 28*(KRANC_GFOFFSET3D(u,0,-2,0) + KRANC_GFOFFSET3D(u,0,2,0)) - 8*(KRANC_GFOFFSET3D(u,0,-3,0) + KRANC_GFOFFSET3D(u,0,3,0)) + KRANC_GFOFFSET3D(u,0,-4,0) + KRANC_GFOFFSET3D(u,0,4,0))*pm1o120dy;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder63(u) ((70*KRANC_GFOFFSET3D(u,0,0,0) - 56*(KRANC_GFOFFSET3D(u,0,0,-1) + KRANC_GFOFFSET3D(u,0,0,1)) + 28*(KRANC_GFOFFSET3D(u,0,0,-2) + KRANC_GFOFFSET3D(u,0,0,2)) - 8*(KRANC_GFOFFSET3D(u,0,0,-3) + KRANC_GFOFFSET3D(u,0,0,3)) + KRANC_GFOFFSET3D(u,0,0,-4) + KRANC_GFOFFSET3D(u,0,0,4))*pm1o120dz)
+#else
+#  define PDupwindNthSymmfdOrder63(u) (PDupwindNthSymmfdOrder63_impl(u,pm1o120dz,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder63_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o120dz, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder63_impl(const CCTK_REAL* restrict const u, const CCTK_REAL pm1o120dz, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return PDupwindNthSymmfdOrder62_impl(u, pm1o120dz, cdk, cdj);
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder81(u) ((-252*KRANC_GFOFFSET3D(u,0,0,0) + 210*(KRANC_GFOFFSET3D(u,-1,0,0) + KRANC_GFOFFSET3D(u,1,0,0)) - 120*(KRANC_GFOFFSET3D(u,-2,0,0) + KRANC_GFOFFSET3D(u,2,0,0)) + 45*(KRANC_GFOFFSET3D(u,-3,0,0) + KRANC_GFOFFSET3D(u,3,0,0)) - 10*(KRANC_GFOFFSET3D(u,-4,0,0) + KRANC_GFOFFSET3D(u,4,0,0)) + KRANC_GFOFFSET3D(u,-5,0,0) + KRANC_GFOFFSET3D(u,5,0,0))*p1o560dx)
+#else
+#  define PDupwindNthSymmfdOrder81(u) (PDupwindNthSymmfdOrder81_impl(u,p1o560dx,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder81_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o560dx, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder81_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o560dx, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-252*KRANC_GFOFFSET3D(u,0,0,0) + 210*(KRANC_GFOFFSET3D(u,-1,0,0) + KRANC_GFOFFSET3D(u,1,0,0)) - 120*(KRANC_GFOFFSET3D(u,-2,0,0) + KRANC_GFOFFSET3D(u,2,0,0)) + 45*(KRANC_GFOFFSET3D(u,-3,0,0) + KRANC_GFOFFSET3D(u,3,0,0)) - 10*(KRANC_GFOFFSET3D(u,-4,0,0) + KRANC_GFOFFSET3D(u,4,0,0)) + KRANC_GFOFFSET3D(u,-5,0,0) + KRANC_GFOFFSET3D(u,5,0,0))*p1o560dx;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder82(u) ((-252*KRANC_GFOFFSET3D(u,0,0,0) + 210*(KRANC_GFOFFSET3D(u,0,-1,0) + KRANC_GFOFFSET3D(u,0,1,0)) - 120*(KRANC_GFOFFSET3D(u,0,-2,0) + KRANC_GFOFFSET3D(u,0,2,0)) + 45*(KRANC_GFOFFSET3D(u,0,-3,0) + KRANC_GFOFFSET3D(u,0,3,0)) - 10*(KRANC_GFOFFSET3D(u,0,-4,0) + KRANC_GFOFFSET3D(u,0,4,0)) + KRANC_GFOFFSET3D(u,0,-5,0) + KRANC_GFOFFSET3D(u,0,5,0))*p1o560dy)
+#else
+#  define PDupwindNthSymmfdOrder82(u) (PDupwindNthSymmfdOrder82_impl(u,p1o560dy,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder82_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o560dy, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder82_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o560dy, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-252*KRANC_GFOFFSET3D(u,0,0,0) + 210*(KRANC_GFOFFSET3D(u,0,-1,0) + KRANC_GFOFFSET3D(u,0,1,0)) - 120*(KRANC_GFOFFSET3D(u,0,-2,0) + KRANC_GFOFFSET3D(u,0,2,0)) + 45*(KRANC_GFOFFSET3D(u,0,-3,0) + KRANC_GFOFFSET3D(u,0,3,0)) - 10*(KRANC_GFOFFSET3D(u,0,-4,0) + KRANC_GFOFFSET3D(u,0,4,0)) + KRANC_GFOFFSET3D(u,0,-5,0) + KRANC_GFOFFSET3D(u,0,5,0))*p1o560dy;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthSymmfdOrder83(u) ((-252*KRANC_GFOFFSET3D(u,0,0,0) + 210*(KRANC_GFOFFSET3D(u,0,0,-1) + KRANC_GFOFFSET3D(u,0,0,1)) - 120*(KRANC_GFOFFSET3D(u,0,0,-2) + KRANC_GFOFFSET3D(u,0,0,2)) + 45*(KRANC_GFOFFSET3D(u,0,0,-3) + KRANC_GFOFFSET3D(u,0,0,3)) - 10*(KRANC_GFOFFSET3D(u,0,0,-4) + KRANC_GFOFFSET3D(u,0,0,4)) + KRANC_GFOFFSET3D(u,0,0,-5) + KRANC_GFOFFSET3D(u,0,0,5))*p1o560dz)
+#else
+#  define PDupwindNthSymmfdOrder83(u) (PDupwindNthSymmfdOrder83_impl(u,p1o560dz,cdj,cdk))
+static CCTK_REAL PDupwindNthSymmfdOrder83_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o560dz, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthSymmfdOrder83_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o560dz, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return PDupwindNthSymmfdOrder82_impl(u, p1o560dz, cdk, cdj);
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder21(u) ((-4*KRANC_GFOFFSET3D(u,-1,0,0) + 4*KRANC_GFOFFSET3D(u,1,0,0) + KRANC_GFOFFSET3D(u,-2,0,0) - KRANC_GFOFFSET3D(u,2,0,0))*p1o4dx)
+#else
+#  define PDupwindNthAntifdOrder21(u) (PDupwindNthAntifdOrder21_impl(u,p1o4dx,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder21_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o4dx, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder21_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o4dx, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-4*KRANC_GFOFFSET3D(u,-1,0,0) + 4*KRANC_GFOFFSET3D(u,1,0,0) + KRANC_GFOFFSET3D(u,-2,0,0) - KRANC_GFOFFSET3D(u,2,0,0))*p1o4dx;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder22(u) ((-4*KRANC_GFOFFSET3D(u,0,-1,0) + 4*KRANC_GFOFFSET3D(u,0,1,0) + KRANC_GFOFFSET3D(u,0,-2,0) - KRANC_GFOFFSET3D(u,0,2,0))*p1o4dy)
+#else
+#  define PDupwindNthAntifdOrder22(u) (PDupwindNthAntifdOrder22_impl(u,p1o4dy,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder22_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o4dy, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder22_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o4dy, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-4*KRANC_GFOFFSET3D(u,0,-1,0) + 4*KRANC_GFOFFSET3D(u,0,1,0) + KRANC_GFOFFSET3D(u,0,-2,0) - KRANC_GFOFFSET3D(u,0,2,0))*p1o4dy;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder23(u) ((-4*KRANC_GFOFFSET3D(u,0,0,-1) + 4*KRANC_GFOFFSET3D(u,0,0,1) + KRANC_GFOFFSET3D(u,0,0,-2) - KRANC_GFOFFSET3D(u,0,0,2))*p1o4dz)
+#else
+#  define PDupwindNthAntifdOrder23(u) (PDupwindNthAntifdOrder23_impl(u,p1o4dz,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder23_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o4dz, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder23_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o4dz, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return PDupwindNthAntifdOrder22_impl(u, p1o4dz, cdk, cdj);
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder41(u) ((-21*KRANC_GFOFFSET3D(u,-1,0,0) + 21*KRANC_GFOFFSET3D(u,1,0,0) + 6*KRANC_GFOFFSET3D(u,-2,0,0) - 6*KRANC_GFOFFSET3D(u,2,0,0) - KRANC_GFOFFSET3D(u,-3,0,0) + KRANC_GFOFFSET3D(u,3,0,0))*p1o24dx)
+#else
+#  define PDupwindNthAntifdOrder41(u) (PDupwindNthAntifdOrder41_impl(u,p1o24dx,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder41_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dx, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder41_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dx, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-21*KRANC_GFOFFSET3D(u,-1,0,0) + 21*KRANC_GFOFFSET3D(u,1,0,0) + 6*KRANC_GFOFFSET3D(u,-2,0,0) - 6*KRANC_GFOFFSET3D(u,2,0,0) - KRANC_GFOFFSET3D(u,-3,0,0) + KRANC_GFOFFSET3D(u,3,0,0))*p1o24dx;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder42(u) ((-21*KRANC_GFOFFSET3D(u,0,-1,0) + 21*KRANC_GFOFFSET3D(u,0,1,0) + 6*KRANC_GFOFFSET3D(u,0,-2,0) - 6*KRANC_GFOFFSET3D(u,0,2,0) - KRANC_GFOFFSET3D(u,0,-3,0) + KRANC_GFOFFSET3D(u,0,3,0))*p1o24dy)
+#else
+#  define PDupwindNthAntifdOrder42(u) (PDupwindNthAntifdOrder42_impl(u,p1o24dy,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder42_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dy, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder42_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dy, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-21*KRANC_GFOFFSET3D(u,0,-1,0) + 21*KRANC_GFOFFSET3D(u,0,1,0) + 6*KRANC_GFOFFSET3D(u,0,-2,0) - 6*KRANC_GFOFFSET3D(u,0,2,0) - KRANC_GFOFFSET3D(u,0,-3,0) + KRANC_GFOFFSET3D(u,0,3,0))*p1o24dy;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder43(u) ((-21*KRANC_GFOFFSET3D(u,0,0,-1) + 21*KRANC_GFOFFSET3D(u,0,0,1) + 6*KRANC_GFOFFSET3D(u,0,0,-2) - 6*KRANC_GFOFFSET3D(u,0,0,2) - KRANC_GFOFFSET3D(u,0,0,-3) + KRANC_GFOFFSET3D(u,0,0,3))*p1o24dz)
+#else
+#  define PDupwindNthAntifdOrder43(u) (PDupwindNthAntifdOrder43_impl(u,p1o24dz,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder43_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dz, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder43_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o24dz, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return PDupwindNthAntifdOrder42_impl(u, p1o24dz, cdk, cdj);
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder61(u) ((-104*KRANC_GFOFFSET3D(u,-1,0,0) + 104*KRANC_GFOFFSET3D(u,1,0,0) + 32*KRANC_GFOFFSET3D(u,-2,0,0) - 32*KRANC_GFOFFSET3D(u,2,0,0) - 8*KRANC_GFOFFSET3D(u,-3,0,0) + 8*KRANC_GFOFFSET3D(u,3,0,0) + KRANC_GFOFFSET3D(u,-4,0,0) - KRANC_GFOFFSET3D(u,4,0,0))*p1o120dx)
+#else
+#  define PDupwindNthAntifdOrder61(u) (PDupwindNthAntifdOrder61_impl(u,p1o120dx,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder61_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o120dx, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder61_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o120dx, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-104*KRANC_GFOFFSET3D(u,-1,0,0) + 104*KRANC_GFOFFSET3D(u,1,0,0) + 32*KRANC_GFOFFSET3D(u,-2,0,0) - 32*KRANC_GFOFFSET3D(u,2,0,0) - 8*KRANC_GFOFFSET3D(u,-3,0,0) + 8*KRANC_GFOFFSET3D(u,3,0,0) + KRANC_GFOFFSET3D(u,-4,0,0) - KRANC_GFOFFSET3D(u,4,0,0))*p1o120dx;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder62(u) ((-104*KRANC_GFOFFSET3D(u,0,-1,0) + 104*KRANC_GFOFFSET3D(u,0,1,0) + 32*KRANC_GFOFFSET3D(u,0,-2,0) - 32*KRANC_GFOFFSET3D(u,0,2,0) - 8*KRANC_GFOFFSET3D(u,0,-3,0) + 8*KRANC_GFOFFSET3D(u,0,3,0) + KRANC_GFOFFSET3D(u,0,-4,0) - KRANC_GFOFFSET3D(u,0,4,0))*p1o120dy)
+#else
+#  define PDupwindNthAntifdOrder62(u) (PDupwindNthAntifdOrder62_impl(u,p1o120dy,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder62_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o120dy, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder62_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o120dy, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-104*KRANC_GFOFFSET3D(u,0,-1,0) + 104*KRANC_GFOFFSET3D(u,0,1,0) + 32*KRANC_GFOFFSET3D(u,0,-2,0) - 32*KRANC_GFOFFSET3D(u,0,2,0) - 8*KRANC_GFOFFSET3D(u,0,-3,0) + 8*KRANC_GFOFFSET3D(u,0,3,0) + KRANC_GFOFFSET3D(u,0,-4,0) - KRANC_GFOFFSET3D(u,0,4,0))*p1o120dy;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder63(u) ((-104*KRANC_GFOFFSET3D(u,0,0,-1) + 104*KRANC_GFOFFSET3D(u,0,0,1) + 32*KRANC_GFOFFSET3D(u,0,0,-2) - 32*KRANC_GFOFFSET3D(u,0,0,2) - 8*KRANC_GFOFFSET3D(u,0,0,-3) + 8*KRANC_GFOFFSET3D(u,0,0,3) + KRANC_GFOFFSET3D(u,0,0,-4) - KRANC_GFOFFSET3D(u,0,0,4))*p1o120dz)
+#else
+#  define PDupwindNthAntifdOrder63(u) (PDupwindNthAntifdOrder63_impl(u,p1o120dz,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder63_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o120dz, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder63_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o120dz, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return PDupwindNthAntifdOrder62_impl(u, p1o120dz, cdk, cdj);
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder81(u) ((-1470*KRANC_GFOFFSET3D(u,-1,0,0) + 1470*KRANC_GFOFFSET3D(u,1,0,0) + 480*KRANC_GFOFFSET3D(u,-2,0,0) - 480*KRANC_GFOFFSET3D(u,2,0,0) - 145*KRANC_GFOFFSET3D(u,-3,0,0) + 145*KRANC_GFOFFSET3D(u,3,0,0) + 30*KRANC_GFOFFSET3D(u,-4,0,0) - 30*KRANC_GFOFFSET3D(u,4,0,0) - 3*KRANC_GFOFFSET3D(u,-5,0,0) + 3*KRANC_GFOFFSET3D(u,5,0,0))*p1o1680dx)
+#else
+#  define PDupwindNthAntifdOrder81(u) (PDupwindNthAntifdOrder81_impl(u,p1o1680dx,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder81_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o1680dx, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder81_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o1680dx, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-1470*KRANC_GFOFFSET3D(u,-1,0,0) + 1470*KRANC_GFOFFSET3D(u,1,0,0) + 480*KRANC_GFOFFSET3D(u,-2,0,0) - 480*KRANC_GFOFFSET3D(u,2,0,0) - 145*KRANC_GFOFFSET3D(u,-3,0,0) + 145*KRANC_GFOFFSET3D(u,3,0,0) + 30*KRANC_GFOFFSET3D(u,-4,0,0) - 30*KRANC_GFOFFSET3D(u,4,0,0) - 3*KRANC_GFOFFSET3D(u,-5,0,0) + 3*KRANC_GFOFFSET3D(u,5,0,0))*p1o1680dx;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder82(u) ((-1470*KRANC_GFOFFSET3D(u,0,-1,0) + 1470*KRANC_GFOFFSET3D(u,0,1,0) + 480*KRANC_GFOFFSET3D(u,0,-2,0) - 480*KRANC_GFOFFSET3D(u,0,2,0) - 145*KRANC_GFOFFSET3D(u,0,-3,0) + 145*KRANC_GFOFFSET3D(u,0,3,0) + 30*KRANC_GFOFFSET3D(u,0,-4,0) - 30*KRANC_GFOFFSET3D(u,0,4,0) - 3*KRANC_GFOFFSET3D(u,0,-5,0) + 3*KRANC_GFOFFSET3D(u,0,5,0))*p1o1680dy)
+#else
+#  define PDupwindNthAntifdOrder82(u) (PDupwindNthAntifdOrder82_impl(u,p1o1680dy,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder82_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o1680dy, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder82_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o1680dy, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return (-1470*KRANC_GFOFFSET3D(u,0,-1,0) + 1470*KRANC_GFOFFSET3D(u,0,1,0) + 480*KRANC_GFOFFSET3D(u,0,-2,0) - 480*KRANC_GFOFFSET3D(u,0,2,0) - 145*KRANC_GFOFFSET3D(u,0,-3,0) + 145*KRANC_GFOFFSET3D(u,0,3,0) + 30*KRANC_GFOFFSET3D(u,0,-4,0) - 30*KRANC_GFOFFSET3D(u,0,4,0) - 3*KRANC_GFOFFSET3D(u,0,-5,0) + 3*KRANC_GFOFFSET3D(u,0,5,0))*p1o1680dy;
+}
+#endif
+
+#ifndef KRANC_DIFF_FUNCTIONS
+#  define PDupwindNthAntifdOrder83(u) ((-1470*KRANC_GFOFFSET3D(u,0,0,-1) + 1470*KRANC_GFOFFSET3D(u,0,0,1) + 480*KRANC_GFOFFSET3D(u,0,0,-2) - 480*KRANC_GFOFFSET3D(u,0,0,2) - 145*KRANC_GFOFFSET3D(u,0,0,-3) + 145*KRANC_GFOFFSET3D(u,0,0,3) + 30*KRANC_GFOFFSET3D(u,0,0,-4) - 30*KRANC_GFOFFSET3D(u,0,0,4) - 3*KRANC_GFOFFSET3D(u,0,0,-5) + 3*KRANC_GFOFFSET3D(u,0,0,5))*p1o1680dz)
+#else
+#  define PDupwindNthAntifdOrder83(u) (PDupwindNthAntifdOrder83_impl(u,p1o1680dz,cdj,cdk))
+static CCTK_REAL PDupwindNthAntifdOrder83_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o1680dz, const ptrdiff_t cdj, const ptrdiff_t cdk) CCTK_ATTRIBUTE_NOINLINE CCTK_ATTRIBUTE_UNUSED;
+static CCTK_REAL PDupwindNthAntifdOrder83_impl(const CCTK_REAL* restrict const u, const CCTK_REAL p1o1680dz, const ptrdiff_t cdj, const ptrdiff_t cdk)
+{
+  const ptrdiff_t cdi CCTK_ATTRIBUTE_UNUSED = sizeof(CCTK_REAL);
+  return PDupwindNthAntifdOrder82_impl(u, p1o1680dz, cdk, cdj);
+}
+#endif
+

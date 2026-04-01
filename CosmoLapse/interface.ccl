@@ -50,6 +50,18 @@ CCTK_REAL propertime type=GF timelevels=4 tags='tensortypealias="Scalar" tensorw
 } "propertime"
 
 public:
+CCTK_REAL Kthreshold type=GF timelevels=4 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  Ktransition
+} "Kthreshold"
+
+public:
+CCTK_REAL Kthresholdrhs type=GF timelevels=4 tags='tensortypealias="Scalar" tensorweight=0 Prolongation="None"'
+{
+  Ktransitionrhs
+} "Kthresholdrhs"
+
+public:
 CCTK_REAL propertimerhs type=GF timelevels=4 tags='tensortypealias="Scalar" tensorweight=0 Prolongation="None"'
 {
   taurhs

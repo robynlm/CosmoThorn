@@ -32,6 +32,9 @@ extern "C" void CosmoLapse_dtLapsePostRHS_SelectBCs(CCTK_ARGUMENTS)
   ierr = KrancBdy_SelectGroupForBC(cctkGH, CCTK_ALL_FACES, GetBoundaryWidth(cctkGH), -1 /* no table */, "ADMBase::dtlapse","flat");
   if (ierr < 0)
     CCTK_WARN(CCTK_WARN_ALERT, "Failed to register flat BC for ADMBase::dtlapse.");
+  ierr = KrancBdy_SelectGroupForBC(cctkGH, CCTK_ALL_FACES, GetBoundaryWidth(cctkGH), -1 /* no table */, "CosmoLapse::Kthreshold","flat");
+  if (ierr < 0)
+    CCTK_WARN(CCTK_WARN_ALERT, "Failed to register flat BC for CosmoLapse::Kthreshold.");
   ierr = KrancBdy_SelectGroupForBC(cctkGH, CCTK_ALL_FACES, GetBoundaryWidth(cctkGH), -1 /* no table */, "ML_BSSN::ML_lapserhs","flat");
   if (ierr < 0)
     CCTK_WARN(CCTK_WARN_ALERT, "Failed to register flat BC for ML_BSSN::ML_lapserhs.");
@@ -81,27 +84,42 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
   const CCTK_REAL hdyi CCTK_ATTRIBUTE_UNUSED = 0.5*dyi;
   const CCTK_REAL hdzi CCTK_ATTRIBUTE_UNUSED = 0.5*dzi;
   /* Initialize predefined quantities */
+  const CCTK_REAL p1o120dx CCTK_ATTRIBUTE_UNUSED = 0.00833333333333333333333333333333*pow(dx,-1);
+  const CCTK_REAL p1o120dy CCTK_ATTRIBUTE_UNUSED = 0.00833333333333333333333333333333*pow(dy,-1);
+  const CCTK_REAL p1o120dz CCTK_ATTRIBUTE_UNUSED = 0.00833333333333333333333333333333*pow(dz,-1);
   const CCTK_REAL p1o12dx CCTK_ATTRIBUTE_UNUSED = 0.0833333333333333333333333333333*pow(dx,-1);
   const CCTK_REAL p1o12dy CCTK_ATTRIBUTE_UNUSED = 0.0833333333333333333333333333333*pow(dy,-1);
   const CCTK_REAL p1o12dz CCTK_ATTRIBUTE_UNUSED = 0.0833333333333333333333333333333*pow(dz,-1);
   const CCTK_REAL p1o144dxdy CCTK_ATTRIBUTE_UNUSED = 0.00694444444444444444444444444444*pow(dx,-1)*pow(dy,-1);
   const CCTK_REAL p1o144dxdz CCTK_ATTRIBUTE_UNUSED = 0.00694444444444444444444444444444*pow(dx,-1)*pow(dz,-1);
   const CCTK_REAL p1o144dydz CCTK_ATTRIBUTE_UNUSED = 0.00694444444444444444444444444444*pow(dy,-1)*pow(dz,-1);
+  const CCTK_REAL p1o1680dx CCTK_ATTRIBUTE_UNUSED = 0.000595238095238095238095238095238*pow(dx,-1);
+  const CCTK_REAL p1o1680dy CCTK_ATTRIBUTE_UNUSED = 0.000595238095238095238095238095238*pow(dy,-1);
+  const CCTK_REAL p1o1680dz CCTK_ATTRIBUTE_UNUSED = 0.000595238095238095238095238095238*pow(dz,-1);
   const CCTK_REAL p1o180dx2 CCTK_ATTRIBUTE_UNUSED = 0.00555555555555555555555555555556*pow(dx,-2);
   const CCTK_REAL p1o180dy2 CCTK_ATTRIBUTE_UNUSED = 0.00555555555555555555555555555556*pow(dy,-2);
   const CCTK_REAL p1o180dz2 CCTK_ATTRIBUTE_UNUSED = 0.00555555555555555555555555555556*pow(dz,-2);
+  const CCTK_REAL p1o24dx CCTK_ATTRIBUTE_UNUSED = 0.0416666666666666666666666666667*pow(dx,-1);
+  const CCTK_REAL p1o24dy CCTK_ATTRIBUTE_UNUSED = 0.0416666666666666666666666666667*pow(dy,-1);
+  const CCTK_REAL p1o24dz CCTK_ATTRIBUTE_UNUSED = 0.0416666666666666666666666666667*pow(dz,-1);
   const CCTK_REAL p1o2dx CCTK_ATTRIBUTE_UNUSED = 0.5*pow(dx,-1);
   const CCTK_REAL p1o2dy CCTK_ATTRIBUTE_UNUSED = 0.5*pow(dy,-1);
   const CCTK_REAL p1o2dz CCTK_ATTRIBUTE_UNUSED = 0.5*pow(dz,-1);
   const CCTK_REAL p1o3600dxdy CCTK_ATTRIBUTE_UNUSED = 0.000277777777777777777777777777778*pow(dx,-1)*pow(dy,-1);
   const CCTK_REAL p1o3600dxdz CCTK_ATTRIBUTE_UNUSED = 0.000277777777777777777777777777778*pow(dx,-1)*pow(dz,-1);
   const CCTK_REAL p1o3600dydz CCTK_ATTRIBUTE_UNUSED = 0.000277777777777777777777777777778*pow(dy,-1)*pow(dz,-1);
+  const CCTK_REAL p1o4dx CCTK_ATTRIBUTE_UNUSED = 0.25*pow(dx,-1);
   const CCTK_REAL p1o4dxdy CCTK_ATTRIBUTE_UNUSED = 0.25*pow(dx,-1)*pow(dy,-1);
   const CCTK_REAL p1o4dxdz CCTK_ATTRIBUTE_UNUSED = 0.25*pow(dx,-1)*pow(dz,-1);
+  const CCTK_REAL p1o4dy CCTK_ATTRIBUTE_UNUSED = 0.25*pow(dy,-1);
   const CCTK_REAL p1o4dydz CCTK_ATTRIBUTE_UNUSED = 0.25*pow(dy,-1)*pow(dz,-1);
+  const CCTK_REAL p1o4dz CCTK_ATTRIBUTE_UNUSED = 0.25*pow(dz,-1);
   const CCTK_REAL p1o5040dx2 CCTK_ATTRIBUTE_UNUSED = 0.000198412698412698412698412698413*pow(dx,-2);
   const CCTK_REAL p1o5040dy2 CCTK_ATTRIBUTE_UNUSED = 0.000198412698412698412698412698413*pow(dy,-2);
   const CCTK_REAL p1o5040dz2 CCTK_ATTRIBUTE_UNUSED = 0.000198412698412698412698412698413*pow(dz,-2);
+  const CCTK_REAL p1o560dx CCTK_ATTRIBUTE_UNUSED = 0.00178571428571428571428571428571*pow(dx,-1);
+  const CCTK_REAL p1o560dy CCTK_ATTRIBUTE_UNUSED = 0.00178571428571428571428571428571*pow(dy,-1);
+  const CCTK_REAL p1o560dz CCTK_ATTRIBUTE_UNUSED = 0.00178571428571428571428571428571*pow(dz,-1);
   const CCTK_REAL p1o60dx CCTK_ATTRIBUTE_UNUSED = 0.0166666666666666666666666666667*pow(dx,-1);
   const CCTK_REAL p1o60dy CCTK_ATTRIBUTE_UNUSED = 0.0166666666666666666666666666667*pow(dy,-1);
   const CCTK_REAL p1o60dz CCTK_ATTRIBUTE_UNUSED = 0.0166666666666666666666666666667*pow(dz,-1);
@@ -114,9 +132,15 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
   const CCTK_REAL p1odx2 CCTK_ATTRIBUTE_UNUSED = pow(dx,-2);
   const CCTK_REAL p1ody2 CCTK_ATTRIBUTE_UNUSED = pow(dy,-2);
   const CCTK_REAL p1odz2 CCTK_ATTRIBUTE_UNUSED = pow(dz,-2);
+  const CCTK_REAL pm1o120dx CCTK_ATTRIBUTE_UNUSED = -0.00833333333333333333333333333333*pow(dx,-1);
+  const CCTK_REAL pm1o120dy CCTK_ATTRIBUTE_UNUSED = -0.00833333333333333333333333333333*pow(dy,-1);
+  const CCTK_REAL pm1o120dz CCTK_ATTRIBUTE_UNUSED = -0.00833333333333333333333333333333*pow(dz,-1);
   const CCTK_REAL pm1o12dx2 CCTK_ATTRIBUTE_UNUSED = -0.0833333333333333333333333333333*pow(dx,-2);
   const CCTK_REAL pm1o12dy2 CCTK_ATTRIBUTE_UNUSED = -0.0833333333333333333333333333333*pow(dy,-2);
   const CCTK_REAL pm1o12dz2 CCTK_ATTRIBUTE_UNUSED = -0.0833333333333333333333333333333*pow(dz,-2);
+  const CCTK_REAL pm1o4dx CCTK_ATTRIBUTE_UNUSED = -0.25*pow(dx,-1);
+  const CCTK_REAL pm1o4dy CCTK_ATTRIBUTE_UNUSED = -0.25*pow(dy,-1);
+  const CCTK_REAL pm1o4dz CCTK_ATTRIBUTE_UNUSED = -0.25*pow(dz,-1);
   /* Jacobian variable pointers */
   const bool usejacobian1 = (!CCTK_IsFunctionAliased("MultiPatch_GetMap") || MultiPatch_GetMap(cctkGH) != jacobian_identity_map)
                         && strlen(jacobian_group) > 0;
@@ -207,6 +231,7 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
     CCTK_REAL betayL CCTK_ATTRIBUTE_UNUSED = betay[index];
     CCTK_REAL betazL CCTK_ATTRIBUTE_UNUSED = betaz[index];
     CCTK_REAL epsL CCTK_ATTRIBUTE_UNUSED = eps[index];
+    CCTK_REAL KtransitionL CCTK_ATTRIBUTE_UNUSED = Ktransition[index];
     CCTK_REAL pressL CCTK_ATTRIBUTE_UNUSED = press[index];
     CCTK_REAL rhoL CCTK_ATTRIBUTE_UNUSED = rho[index];
     CCTK_REAL tauL CCTK_ATTRIBUTE_UNUSED = tau[index];
@@ -232,6 +257,9 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
     CCTK_REAL PDstandardNth1alp CCTK_ATTRIBUTE_UNUSED;
     CCTK_REAL PDstandardNth2alp CCTK_ATTRIBUTE_UNUSED;
     CCTK_REAL PDstandardNth3alp CCTK_ATTRIBUTE_UNUSED;
+    CCTK_REAL PDupwindNthAnti1alp CCTK_ATTRIBUTE_UNUSED;
+    CCTK_REAL PDupwindNthAnti2alp CCTK_ATTRIBUTE_UNUSED;
+    CCTK_REAL PDupwindNthAnti3alp CCTK_ATTRIBUTE_UNUSED;
     
     switch (fdOrder)
     {
@@ -240,6 +268,9 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
         PDstandardNth1alp = PDstandardNthfdOrder21(&alp[index]);
         PDstandardNth2alp = PDstandardNthfdOrder22(&alp[index]);
         PDstandardNth3alp = PDstandardNthfdOrder23(&alp[index]);
+        PDupwindNthAnti1alp = PDupwindNthAntifdOrder21(&alp[index]);
+        PDupwindNthAnti2alp = PDupwindNthAntifdOrder22(&alp[index]);
+        PDupwindNthAnti3alp = PDupwindNthAntifdOrder23(&alp[index]);
         break;
       }
       
@@ -248,6 +279,9 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
         PDstandardNth1alp = PDstandardNthfdOrder41(&alp[index]);
         PDstandardNth2alp = PDstandardNthfdOrder42(&alp[index]);
         PDstandardNth3alp = PDstandardNthfdOrder43(&alp[index]);
+        PDupwindNthAnti1alp = PDupwindNthAntifdOrder41(&alp[index]);
+        PDupwindNthAnti2alp = PDupwindNthAntifdOrder42(&alp[index]);
+        PDupwindNthAnti3alp = PDupwindNthAntifdOrder43(&alp[index]);
         break;
       }
       
@@ -256,6 +290,9 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
         PDstandardNth1alp = PDstandardNthfdOrder61(&alp[index]);
         PDstandardNth2alp = PDstandardNthfdOrder62(&alp[index]);
         PDstandardNth3alp = PDstandardNthfdOrder63(&alp[index]);
+        PDupwindNthAnti1alp = PDupwindNthAntifdOrder61(&alp[index]);
+        PDupwindNthAnti2alp = PDupwindNthAntifdOrder62(&alp[index]);
+        PDupwindNthAnti3alp = PDupwindNthAntifdOrder63(&alp[index]);
         break;
       }
       
@@ -264,6 +301,9 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
         PDstandardNth1alp = PDstandardNthfdOrder81(&alp[index]);
         PDstandardNth2alp = PDstandardNthfdOrder82(&alp[index]);
         PDstandardNth3alp = PDstandardNthfdOrder83(&alp[index]);
+        PDupwindNthAnti1alp = PDupwindNthAntifdOrder81(&alp[index]);
+        PDupwindNthAnti2alp = PDupwindNthAntifdOrder82(&alp[index]);
+        PDupwindNthAnti3alp = PDupwindNthAntifdOrder83(&alp[index]);
         break;
       }
       default:
@@ -273,6 +313,9 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
     CCTK_REAL JacPDstandardNth1alp CCTK_ATTRIBUTE_UNUSED;
     CCTK_REAL JacPDstandardNth2alp CCTK_ATTRIBUTE_UNUSED;
     CCTK_REAL JacPDstandardNth3alp CCTK_ATTRIBUTE_UNUSED;
+    CCTK_REAL JacPDupwindNthAnti1alp CCTK_ATTRIBUTE_UNUSED;
+    CCTK_REAL JacPDupwindNthAnti2alp CCTK_ATTRIBUTE_UNUSED;
+    CCTK_REAL JacPDupwindNthAnti3alp CCTK_ATTRIBUTE_UNUSED;
     
     if (usejacobian)
     {
@@ -284,6 +327,15 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
       
       JacPDstandardNth3alp = J13L*PDstandardNth1alp + J23L*PDstandardNth2alp 
         + J33L*PDstandardNth3alp;
+      
+      JacPDupwindNthAnti1alp = J11L*PDupwindNthAnti1alp + 
+        J21L*PDupwindNthAnti2alp + J31L*PDupwindNthAnti3alp;
+      
+      JacPDupwindNthAnti2alp = J12L*PDupwindNthAnti1alp + 
+        J22L*PDupwindNthAnti2alp + J32L*PDupwindNthAnti3alp;
+      
+      JacPDupwindNthAnti3alp = J13L*PDupwindNthAnti1alp + 
+        J23L*PDupwindNthAnti2alp + J33L*PDupwindNthAnti3alp;
     }
     else
     {
@@ -292,6 +344,12 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
       JacPDstandardNth2alp = PDstandardNth2alp;
       
       JacPDstandardNth3alp = PDstandardNth3alp;
+      
+      JacPDupwindNthAnti1alp = PDupwindNthAnti1alp;
+      
+      JacPDupwindNthAnti2alp = PDupwindNthAnti2alp;
+      
+      JacPDupwindNthAnti3alp = PDupwindNthAnti3alp;
     }
     
     CCTK_REAL eosw CCTK_ATTRIBUTE_UNUSED = pressL*pow(rhoL + 
@@ -301,29 +359,27 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
     
     CCTK_REAL fBM CCTK_ATTRIBUTE_UNUSED = fBMa + fBMb*pow(alpL,fBMc);
     
-    CCTK_REAL expterm CCTK_ATTRIBUTE_UNUSED = KaSteepness*(trKL - 
-      KaTransition);
+    CCTK_REAL KaTransitionVal CCTK_ATTRIBUTE_UNUSED = 
+      IfThen(KaTransitionExp == 1,KtransitionL,KaTransition);
     
     CCTK_REAL Ka CCTK_ATTRIBUTE_UNUSED = IfThen(KaExpression == 
-      1,IfThen(expterm > 40,expterm,log(1 + 
-      exp(expterm)))*pow(KaSteepness,-1) + KaTransition*exp(expterm)*pow(1 + 
-      exp(expterm),-1),trKL);
+      1,IfThen(20 + trKL*KaSteepness < 
+      KaSteepness*KaTransitionVal,KaTransitionVal,IfThen(trKL*KaSteepness > 
+      20 + KaSteepness*KaTransitionVal,trKL,KaTransitionVal + log(1 + 
+      exp(KaSteepness*(trKL - KaTransitionVal)))*pow(KaSteepness,-1))),trKL);
+    
+    KtransitionL = -fmax(-KtransitionL,Ka);
     
     CCTK_REAL Kb CCTK_ATTRIBUTE_UNUSED = IfThen(KbExpression == 
-      2,-(IfThen(-(KaSteepness*(Kth + 2.*pow(KaTransition + 
-      eosw*KaTransition,-1))) > 40,-(KaSteepness*(Kth + 2.*pow(KaTransition + 
-      eosw*KaTransition,-1))),log(1 + exp(-(KaSteepness*(Kth + 
-      2.*pow(KaTransition + 
-      eosw*KaTransition,-1))))))*pow(KaSteepness,-1)),IfThen(KbExpression == 
-      1,Kth,0.));
-    
-    CCTK_REAL Kc CCTK_ATTRIBUTE_UNUSED = IfThen(KcExpression == 
-      1,-Kth,1.);
+      2,-8.6832150546992119123561755275*pow((1 + 
+      epsL)*rhoL,0.5),IfThen(KbExpression == 1,Kth,0.));
     
     CCTK_REAL partialtalpha CCTK_ATTRIBUTE_UNUSED = 
-      IfThen(alphaFullLieDeriv != 0,betaxL*JacPDstandardNth1alp + 
-      betayL*JacPDstandardNth2alp + betazL*JacPDstandardNth3alp,0) + fBM*(-Ka 
-      + Kb)*pow(alpL,2)*pow(Kc,-1);
+      IfThen(alphaFullLieDeriv != 0,IfThen(upwind == 
+      1,betaxL*JacPDupwindNthAnti1alp + betayL*JacPDupwindNthAnti2alp + 
+      betazL*JacPDupwindNthAnti3alp,betaxL*JacPDstandardNth1alp + 
+      betayL*JacPDstandardNth2alp + betazL*JacPDstandardNth3alp),0) + 
+      fBM*(-Ka + Kb)*pow(alpL,2);
     
     CCTK_REAL dtalpL CCTK_ATTRIBUTE_UNUSED = partialtalpha;
     
@@ -331,6 +387,7 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
     /* Copy local copies back to grid functions */
     alpharhs[index] = alpharhsL;
     dtalp[index] = dtalpL;
+    Ktransition[index] = KtransitionL;
   }
   CCTK_ENDLOOP3(CosmoLapse_dtLapsePostRHS);
 }
@@ -359,34 +416,35 @@ extern "C" void CosmoLapse_dtLapsePostRHS(CCTK_ARGUMENTS)
     "HydroBase::eps",
     "HydroBase::press",
     "HydroBase::rho",
+    "CosmoLapse::Kthreshold",
     "ML_BSSN::ML_lapserhs",
     "ML_BSSN::ML_trace_curv",
     "CosmoLapse::propertime"};
-  AssertGroupStorage(cctkGH, "CosmoLapse_dtLapsePostRHS", 9, groups);
+  AssertGroupStorage(cctkGH, "CosmoLapse_dtLapsePostRHS", 10, groups);
   
   switch (fdOrder)
   {
     case 2:
     {
-      EnsureStencilFits(cctkGH, "CosmoLapse_dtLapsePostRHS", 1, 1, 1);
+      EnsureStencilFits(cctkGH, "CosmoLapse_dtLapsePostRHS", 2, 2, 2);
       break;
     }
     
     case 4:
     {
-      EnsureStencilFits(cctkGH, "CosmoLapse_dtLapsePostRHS", 2, 2, 2);
+      EnsureStencilFits(cctkGH, "CosmoLapse_dtLapsePostRHS", 3, 3, 3);
       break;
     }
     
     case 6:
     {
-      EnsureStencilFits(cctkGH, "CosmoLapse_dtLapsePostRHS", 3, 3, 3);
+      EnsureStencilFits(cctkGH, "CosmoLapse_dtLapsePostRHS", 4, 4, 4);
       break;
     }
     
     case 8:
     {
-      EnsureStencilFits(cctkGH, "CosmoLapse_dtLapsePostRHS", 4, 4, 4);
+      EnsureStencilFits(cctkGH, "CosmoLapse_dtLapsePostRHS", 5, 5, 5);
       break;
     }
     default:

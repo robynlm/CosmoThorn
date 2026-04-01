@@ -132,11 +132,11 @@ CosmoLapse::fBMc = -2  # default 0
 # K - Kth
 CosmoLapse::KaExpression = 0 # default 0
 CosmoLapse::KbExpression = 1 # default 0
-CosmoLapse::KcExpression = 0 # default 0
 CosmoLapse::alphaFullLieDeriv = 1 #0:no, 1:yes, default 0
 
 # Beta evolution equation
-CosmoLapse::betaXi = 0.75 # default 0
+CosmoLapse::betaXi1 = 0.0 # default 0
+CosmoLapse::betaXi2 = 0.75 # default 0
 CosmoLapse::betaEta = 1.0 # default 0
 CosmoLapse::betaP = 2 # default 1
 CosmoLapse::betaFullLieDeriv = 1 #0:no, 1:yes, default 0

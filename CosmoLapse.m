@@ -10,7 +10,7 @@ thorn = "CosmoLapse";
 (******************************************************************************)
 
 Map [DefineTensor, {
-  tau, dir, g,
+  tau, dir, g, dpsim2, gucon, Ktransition,
   a, admdtalpha, mlbalpharhs, partialtalpha,
   b, admdtbeta, mlbbetarhs, partialtbeta, mlbB, mlbBrhs, partialtB,
   mlbXt, mlbXtrhs,
@@ -53,7 +53,7 @@ inheritedImplementations =
   {"ADMBase", "ML_BSSN", "Cactus", "LocalReduce", "HydroBase"};
 
 ThornGroups = 
-  {DefineGroup1["propertime", tau]};
+  {DefineGroup1["propertime", tau], DefineGroup1["Kthreshold", Ktransition]};
 
 extraGroups = {
   {"ADMBase::metric",        {gxx, gxy, gxz, gyy, gyz, gzz}},
@@ -88,14 +88,23 @@ detgExpr = Det[MatrixOfComponents[g[la,lb]]];
 (* Derivatives *)
 
 SCDO = StandardCenteredDifferenceOperator;
+SUDO = StandardUpwindDifferenceOperator;
+SUDOsymm[p_, m1_Integer, m2_Integer, i_Integer] :=
+  1/2 (SUDO[p, m1, m2, i] - SUDO[p, m2, m1, i]);
+SUDOanti[p_, m1_Integer, m2_Integer, i_Integer] :=
+  1/2 (SUDO[p, m1, m2, i] + SUDO[p, m2, m1, i]);
 
 derivatives = {
   PDstandardNth[i_]    -> SCDO[1, fdOrder/2, i],
   PDstandardNth[i_,i_] -> SCDO[2, fdOrder/2, i],
-  PDstandardNth[i_,j_] -> SCDO[1, fdOrder/2, i] SCDO[1, fdOrder/2, j]
+  PDstandardNth[i_,j_] -> SCDO[1, fdOrder/2, i] SCDO[1, fdOrder/2, j],
+  PDupwindNthSymm[i_] -> SUDOsymm[1, fdOrder/2-1, fdOrder/2+1, i],
+  PDupwindNthAnti[i_] -> SUDOanti[1, fdOrder/2-1, fdOrder/2+1, i]
   };
 
 PD  = PDstandardNth;
+Upwind[dir_, var_, idx_] := dir PDupwindNthAnti[var,idx] 
+                            + Abs[dir] PDupwindNthSymm[var,idx];
  
 (* Split a calculation *) (* Took this from ML_BSSN *)
 
@@ -116,8 +125,15 @@ PartialCalculation[calc_, suffix_, updates_, vars_] :=
     calc3    = mapReplace[calc2, Equations, eqs];
     calc3];
     
-(* Smooth max *)
-LnExp[expr_]:= IfThen[expr>40, expr, Log[1 + Exp[expr]]];
+(* Softplus function *)
+LnExp[K_, S_, T_]:= IfThen[S (K - T) < -20, T,
+                           IfThen[S (K - T) > 20, K, 
+                                  Log[1 + Exp[S (K - T)]]/S + T]];
+
+Advection[LieDeriv_, b_, X_]:= IfThen[LieDeriv!=0, 
+                                      IfThen[upwind==1, Upwind[b[ub], X, lb], 
+                                             b[ub] PD[X, lb]], 
+                                      0];
 
 (******************************************************************************)
 (*                           Master calculations                              *)
@@ -127,31 +143,45 @@ LnExp[expr_]:= IfThen[expr>40, expr, Log[1 + Exp[expr]]];
 
 MasterCalc = {
     Shorthands -> {dir[ua],
-                   partialtalpha, Ka, Kb, Kc, eosw, Kth, fBM, expterm, 
+                   partialtalpha, Ka, KaTransitionVal, Kb, eosw, Kth, fBM,
+                   detg, psi, psim2, dpsim2[la], gucon[ua,ub], eta,
                    partialtbeta[ua], partialtB[ua]},
     Equations -> {
         dir[ua] -> Sign[b[ua]],
+        (* background extrinsic curvature *)
         eosw -> press / (rho (1 + eps)),
         Kth -> - 2.0 / (tau (1 + eosw)),
       
         (***** alpha *****)
         fBM -> fBMa + fBMb a^fBMc,
-        expterm -> KaSteepness (bssntrK - KaTransition),
-        Ka -> IfThen[KaExpression==1, ((LnExp[expterm] / KaSteepness) 
-                                      + (KaTransition / ( 1 + Exp[-expterm]))), bssntrK],
-        Kb -> IfThen[KbExpression==1, Kth, 0.0],
-        Kc -> IfThen[KcExpression==1, -Kth, 1.0],
-        partialtalpha  -> (- a^2 fBM (Ka - Kb) / Kc
-                      + IfThen[alphaFullLieDeriv!=0, b[ua] PD[a,la], 0]),
+        KaTransitionVal -> IfThen[KaTransitionExp==1, Ktransition, 
+                                  KaTransition],
+        Ka -> IfThen[KaExpression==1, LnExp[bssntrK, KaSteepness, KaTransitionVal], 
+                     bssntrK],
+        Ktransition -> - Max[-Ktransition, Ka],
+        Kb -> IfThen[KbExpression==2, - Sqrt[24 Pi (rho (1 + eps))], 
+                     IfThen[KbExpression==1, Kth, 
+                            0.0]],
+        partialtalpha  -> (- a^2 fBM (Ka - Kb) 
+                           + Advection[alphaFullLieDeriv, b, a]),
         
         (***** beta *****)
+        (* evolving eta with eq 4 of 0912.3125*)
+        detg -> detgExpr,
+        psi -> detg^(1/12),
+        psim2 -> psi^(-2),
+        dpsim2[la] -> - (1/6) detg^(-7/6) PD[detgExpr, la],
+        gucon[ua,ub] -> (psi^(4)) detgExpr/detg MatrixInverse[g[ua,ub]],
+        eta -> IfThen[varyingEta==1, betaEta Sqrt[gucon[ua,ub] dpsim2[la] dpsim2[lb]] 
+                                     / ( 1 - psim2 )^2, 
+                      betaEta],
         (* eq 4.3.33 and 4.3.34 in Alcubierre*)
-        partialtbeta[ua] -> mlbB[ua] + IfThen[betaFullLieDeriv!=0, b[ub] PD[b[ua],lb], 0],
-        partialtB[ua] -> (betaXi a^betaP
-                          (mlbXtrhs[ua] - IfThen[betaFullLieDeriv!=0, b[ub] PD[mlbXt[ua],lb], 0])
-                          - betaEta mlbB[ua]
-                          + IfThen[betaFullLieDeriv!=0, b[ub] PD[mlbB[ua],lb], 0]),
-
+        partialtbeta[ua] -> betaXi1 mlbB[ua] + Advection[betaFullLieDeriv, b, b[ua]],
+        partialtB[ua] -> (betaXi2 a^betaP (mlbXtrhs[ua] 
+                                           - Advection[betaFullLieDeriv, b, mlbXt[ua]])
+                          - eta mlbB[ua]
+                          + Advection[betaFullLieDeriv, b, mlbB[ua]]),
+                                  
         (***** Update ADMBase and ML_BSSN *****)
         admdtalpha  -> partialtalpha,
         mlbalpharhs -> partialtalpha,
@@ -169,7 +199,7 @@ dtLapsePostStep = PartialCalculation[
          Schedule -> {"IN MoL_PostStep AFTER ML_BSSN_ADMBaseBoundaryScalar BEFORE ADMBase_SetADMVars"},
          Where -> InteriorNoSync
      },
-     {admdtalpha, mlbalpharhs}];
+     {admdtalpha, mlbalpharhs, Ktransition}];
  
 dtLapsePostRHS = PartialCalculation[
     MasterCalc, "",
@@ -178,7 +208,7 @@ dtLapsePostRHS = PartialCalculation[
          Schedule -> {"IN MoL_PostRHS"},
          Where -> InteriorNoSync
      },
-     {admdtalpha, mlbalpharhs}];
+     {admdtalpha, mlbalpharhs, Ktransition}];
 
 dtLapsePostStepBoundary = 
     {
@@ -188,7 +218,8 @@ dtLapsePostStepBoundary =
          Equations ->
          {
             admdtalpha -> 0.0,
-            mlbalpharhs -> 0.0
+            mlbalpharhs -> 0.0,
+            Ktransition -> 0.0
          }
      };
  
@@ -200,7 +231,8 @@ dtLapsePostRHSBoundary =
          Equations ->
          {
             admdtalpha -> 0.0,
-            mlbalpharhs -> 0.0
+            mlbalpharhs -> 0.0,
+            Ktransition -> 0.0
          }
      };
 
@@ -259,7 +291,8 @@ initialise =
   Where -> Everywhere,
   Equations ->
   {
-    tau -> t
+    tau -> t,
+    Ktransition -> KaTransition
   }
 };
        
@@ -270,7 +303,8 @@ initRHSCalc =
   Where -> Everywhere,
   Equations ->
   {
-    dot[tau] -> 0
+    dot[tau] -> 0,
+    dot[Ktransition] -> 0
   }
 };
 
@@ -281,7 +315,8 @@ evolCalc =
   Where -> Everywhere,
   Equations ->
   {
-    dot[tau] -> (a^2 - b[ua] b[ub] g[la,lb])^(1/2)
+    dot[tau] -> Abs[a^2 - b[ua] b[ub] g[la,lb]]^(1/2),
+    dot[Ktransition] -> 0
   }
 };
  
@@ -306,31 +341,43 @@ realParameters = {
     {
         Name -> fBMa,
         Description -> "f(alpha) = fBMa + fBMb alpha^fBMc",
+        Steerable -> Always,
         Default -> 0.0
     },
     {
         Name -> fBMb,
         Description -> "f(alpha) = fBMa + fBMb alpha^fBMc",
+        Steerable -> Always,
         Default -> 0.0
     },
     {
         Name -> KaSteepness,
-        Description -> "Steepnes of smooth step function, only used if KaExpression = 1",
+        Description -> "Softplus steepness (S), only used if KaExpression = 1",
+        Steerable -> Always,
         Default -> 1.0
     },
     {
         Name -> KaTransition,
-        Description -> "Where smooth step function goes through its' transition, only used if KaExpression = 1",
+        Description -> "Softplus transition (T), only used if KaExpression = 1",
+        Steerable -> Always,
         Default -> 0.0
     },
     {
-        Name -> betaXi,
-        Description -> "d/dt B = alpha^P Xi d/dt Xt^i - Eta B^i",
+        Name -> betaXi1,
+        Description -> "d/dt beta = Xi_1 B^i",
+        Steerable -> Always,
+        Default -> 0.0
+    },
+    {
+        Name -> betaXi2,
+        Description -> "d/dt B = alpha^P Xi_2 d/dt Xt^i - Eta B^i",
+        Steerable -> Always,
         Default -> 0.0
     },
     {
         Name -> betaEta,
-        Description -> "d/dt B = alpha^P Xi d/dt Xt^i - Eta B^i",
+        Description -> "d/dt B = alpha^P Xi_2 d/dt Xt^i - Eta B^i",
+        Steerable -> Always,
         Default -> 0.0
     }};
   
@@ -338,52 +385,77 @@ intParameters = {
     {
         Name -> fBMc,
         Description -> "f(alpha) = fBMa + fBMb alpha^fBMc",
+        Steerable -> Always,
         Default -> 0
     },
     {
        Name -> KaExpression,
-       Description -> "d/dt alpha = - alpha^2 f(alpha) (Ka - Kb) / Kc",
-       AllowedValues -> {{Value -> 0, Description -> "K"},
-                         {Value -> 1, Description -> "ln(1 + exp(steepness (K - transition))) / steepness"}},
+       Description -> "d/dt alpha = - alpha^2 f(alpha) (Ka - Kb)",
+       AllowedValues -> {{Value -> 0, Description -> "Ka = K"},
+                         {Value -> 1, Description -> "Ka = Softplus: Ln[1 + Exp[S (K - T)]] / S + T"}},
+       Steerable -> Always,
+       Default -> 0
+    },
+    {
+       Name -> KaTransitionExp,
+       Description -> "Softplus transition (T) expression, only used if KaExpression = 1",
+       AllowedValues -> {{Value -> 0, Description -> "T = Katransition"},
+                         {Value -> 1, Description -> "T = Katransition then updated as = - max(-T, Ka)"}},
+       Steerable -> Always,
        Default -> 0
     },
     {
        Name -> KbExpression,
-       Description -> "d/dt alpha = - alpha^2 f(alpha) (Ka - Kb) / Kc",
-       AllowedValues -> {{Value -> 0, Description -> "zero"},
-                         {Value -> 1, Description -> "background_K"}},
+       Description -> "d/dt alpha = - alpha^2 f(alpha) (Ka - Kb)",
+       AllowedValues -> {{Value -> 0, Description -> "Kb = 0.0"},
+                         {Value -> 1, Description -> "Kb = background_K: - 2 / (tau (1 + eosw))"},
+                         {Value -> 2, Description -> "Kb = - sqrt{ 24 pi rho (1 + eps) }"}},
+       Steerable -> Always,
        Default -> 0
     },
-    {
-       Name -> KcExpression,
-       Description -> "d/dt alpha = - alpha^2 f(alpha) (Ka - Kb) / Kc",
-       AllowedValues -> {{Value -> 0, Description -> "one"},
-                         {Value -> 1, Description -> "- background_K"}},
-       Default -> 0
-    },
-    {
-        Name -> alphaFullLieDeriv,
-        Description -> "Full Lie derivative, include beta^k partial_k term in alpha evo eq",
-        AllowedValues -> {{Value -> 0, Description -> "no, off"},
-                          {Value -> 1, Description -> "yes, on"}},
-        Default -> 0
-     },
      {
         Name -> betaP,
         Description -> "d/dt B = alpha^P Xi d/dt Xt^i - Eta B^i",
+        Steerable -> Always,
         Default -> 1
+     },
+    {
+        Name -> varyingEta,
+        Description -> "Varying eta parameter in shift condition",
+        AllowedValues -> {{Value -> 0, Description -> "eta = betaEta"},
+                          {Value -> 1, Description -> "eta = betaEta * Eq 4 of https://arxiv.org/pdf/0912.3125"}},
+        Steerable -> Always,
+        Default -> 0
+     },
+    {
+        Name -> alphaFullLieDeriv,
+        Description -> "Include Lie derivative advection terms, beta^k partial_k term in lapse evo",
+        AllowedValues -> {{Value -> 0, Description -> "no, off"},
+                          {Value -> 1, Description -> "yes, on"}},
+        Steerable -> Always,
+        Default -> 0
      },
      {
         Name -> betaFullLieDeriv,
-        Description -> "Full Lie derivative, include beta^k partial_k term in beta evo eq",
-        AllowedValues -> {{Value -> 0, Description -> "no off"},
-                          {Value -> 1, Description -> "yes on"}},
+        Description -> "Include Lie derivative advection terms, beta^k partial_k term in shift evo",
+        AllowedValues -> {{Value -> 0, Description -> "no, off"},
+                          {Value -> 1, Description -> "yes, on"}},
+        Steerable -> Always,
+        Default -> 0
+     },
+    {
+        Name -> upwind,
+        Description -> "Use upwind differencing for Lie derivative advection terms",
+        AllowedValues -> {{Value -> 0, Description -> "no, use centered schemes"},
+                          {Value -> 1, Description -> "yes, use upwind"}},
+        Steerable -> Always,
         Default -> 0
      },
      {
         Name -> fdOrder,
         Description -> "Finite differencing order",
         AllowedValues -> {2, 4, 6, 8},
+        Steerable -> Always,
         Default -> 4
      }};
 

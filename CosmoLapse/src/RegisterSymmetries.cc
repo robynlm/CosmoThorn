@@ -23,4 +23,9 @@ extern "C" void CosmoLapse_RegisterSymmetries(CCTK_ARGUMENTS)
   sym[2] = 1;
   SetCartSymVN(cctkGH, sym, "CosmoLapse::tau");
   
+  sym[0] = 1;
+  sym[1] = 1;
+  sym[2] = 1;
+  SetCartSymVN(cctkGH, sym, "CosmoLapse::Ktransition");
+  
 }

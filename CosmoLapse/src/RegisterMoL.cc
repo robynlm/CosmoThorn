@@ -15,6 +15,7 @@ extern "C" void CosmoLapse_RegisterVars(CCTK_ARGUMENTS)
   
   CCTK_INT ierr CCTK_ATTRIBUTE_UNUSED = 0;
   /* Register all the evolved grid functions with MoL */
+  ierr += MoLRegisterEvolved(CCTK_VarIndex("CosmoLapse::Ktransition"),  CCTK_VarIndex("CosmoLapse::Ktransitionrhs"));
   ierr += MoLRegisterEvolved(CCTK_VarIndex("CosmoLapse::tau"),  CCTK_VarIndex("CosmoLapse::taurhs"));
   /* Register all the evolved Array functions with MoL */
   return;

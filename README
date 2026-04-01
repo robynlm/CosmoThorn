@@ -12,39 +12,41 @@ proper time
 -----------
 
 starting from tau = code time
- >> d(tau)/dt = (alpha^2 - beta^i beta^j g_{ij})^(1/2)
+ >> d(tau)/dt = abs(alpha^2 - beta^i beta^j g_{ij})^(1/2)
 
 gauge
 -----
 
- *** Lapse
-fBM = fBMa + fBMb alpha^fBMc
-Ka = [K, 
-      ((LnExp[expterm] / KaSteepness) 
-       + (KaTransition / ( 1 + Exp[-expterm])))]
-with expterm = KaSteepness * (K - KaTransition)
-Kb = [0, Kth]
-Kc = [1, -Kth]
+ ---- Lapse ----
+
+ >> d(alpha)/dt = - alpha^2 fBM (Ka - Kb)
+
+. fBM = fBMa + fBMb alpha^fBMc
+with user defined "fBMa", "fBMb", "fBMc"
+
+. Ka = [K, softplus]
+user chooses between them with "KaExpression"
+with softplus: Ln[1 + Exp[S (K - T)]] / S + T
+tuned with used defined S = "KaSteepness" and T = "KaTransition"
+ '-> T is updated to be = - max(-T, Ka) if "KaTransitionExp" = 1
+
+. Kb = [0, Kth, - sqrt(24 pi rho (1 + eps))]
+user chooses between them with "KbExpression"
 with Kth = - 2.0 / (tau (1 + eosw)) 
 and eosw = press / (rho (1 + eps)) using terms from HydroBase
- >> d(alpha)/dt = (- alpha^2 fBM (Ka - Kb) / Kc)
-The user chooses:
-int: fBMc
-rel: fBMa, fBMb, KaSteepness, KaTransition
-choice: KaExpression, KbExpression, KcExpression
 
- *** Shift
- >> d(beta^i)/dt = B^i
- >> d(B^i)/dt = (betaXi alpha^betaP d(Xt^i)/dt - betaEta beta^i),
-The user chooses:
-int: betaP
-real: betaXi, betaEta
+ ---- Shift ----
 
-The user can include the Lie derivative along the shift vector term
- >> d()/dt = ... + lie
-The user chooses:
-alphaFullLieDeriv and/or betaFullLieDeriv
-to be 0 "exclude lie term" or 1 "include lie term"
+ >> d(beta^i)/dt = betaXi1 B^i
+ >> d(B^i)/dt = betaXi2 alpha^betaP d(Xt^i)/dt - betaEta beta^i
+with user defined "betaXi1", "betaXi2", "betaP", "betaEta"
+
+ ---- Advection ----
+
+ >> d()/dt = ... + \beta^k \partial_k ()
+The user can include the Lie derivative advection terms by setting 
+ "alphaFullLieDeriv" and "betaFullLieDeriv". 
+And can choose if these are upwinded with "upwind".
 
 Copyright
 =========
@@ -115,13 +117,13 @@ Iteration      Time |              ADMBASE::alp |           COSMOLAPSE::tau |   
         2     1.037 |    0.9999849    1.0000151 |    1.0365077    1.0365083 |    0.0493644    0.0493961 |   -0.0000001    0.0000001
         3     1.055 |    0.9999774    1.0000226 |    1.0547613    1.0547626 |    0.0476704    0.0477014 |   -0.0000001    0.0000001
         4     1.073 |    0.9999700    1.0000300 |    1.0730149    1.0730171 |    0.0460621    0.0460924 |   -0.0000001    0.0000001
-        5     1.091 |    0.9999627    1.0000374 |    1.0912682    1.0912717 |    0.0445337    0.0445635 |   -0.0000002    0.0000001
-        6     1.110 |    0.9999554    1.0000447 |    1.1095215    1.1095264 |    0.0430802    0.0431095 |   -0.0000003    0.0000002
-        7     1.128 |    0.9999482    1.0000519 |    1.1277746    1.1277813 |    0.0416967    0.0417255 |   -0.0000004    0.0000002
-        8     1.146 |    0.9999410    1.0000590 |    1.1460276    1.1460363 |    0.0403788    0.0404070 |   -0.0000005    0.0000002
-        9     1.164 |    0.9999339    1.0000661 |    1.1642804    1.1642914 |    0.0391224    0.0391502 |   -0.0000005    0.0000003
-       10     1.183 |    0.9999270    1.0000731 |    1.1825331    1.1825467 |    0.0379237    0.0379510 |   -0.0000006    0.0000003
-       11     1.201 |    0.9999200    1.0000800 |    1.2007857    1.2008020 |    0.0367792    0.0368062 |   -0.0000006    0.0000004
+        5     1.091 |    0.9999627    1.0000374 |    1.0912682    1.0912717 |    0.0445337    0.0445635 |   -0.0000001    0.0000001
+        6     1.110 |    0.9999554    1.0000447 |    1.1095215    1.1095264 |    0.0430802    0.0431095 |   -0.0000001    0.0000001
+        7     1.128 |    0.9999482    1.0000519 |    1.1277746    1.1277813 |    0.0416967    0.0417255 |   -0.0000002    0.0000001
+        8     1.146 |    0.9999410    1.0000590 |    1.1460276    1.1460363 |    0.0403788    0.0404071 |   -0.0000002    0.0000001
+        9     1.164 |    0.9999339    1.0000661 |    1.1642804    1.1642914 |    0.0391224    0.0391502 |   -0.0000002    0.0000001
+       10     1.183 |    0.9999269    1.0000731 |    1.1825331    1.1825467 |    0.0379237    0.0379510 |   -0.0000004    0.0000001
+       11     1.201 |    0.9999200    1.0000800 |    1.2007857    1.2008020 |    0.0367792    0.0368062 |   -0.0000004    0.0000001
 INFO (Carpet): Terminating due to cctk_final_time at t = 1.200794
 
 ===== 6) Be happy
