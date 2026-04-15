@@ -363,10 +363,11 @@ static void CosmoLapse_dtLapsePostStep_Body(const cGH* restrict const cctkGH, co
       IfThen(KaTransitionExp == 1,KtransitionL,KaTransition);
     
     CCTK_REAL Ka CCTK_ATTRIBUTE_UNUSED = IfThen(KaExpression == 
-      1,IfThen(20 + trKL*KaSteepness < 
-      KaSteepness*KaTransitionVal,KaTransitionVal,IfThen(trKL*KaSteepness > 
+      2,trKL*exp(-alpL),IfThen(KaExpression == 1,IfThen(20 + trKL*KaSteepness 
+      < KaSteepness*KaTransitionVal,KaTransitionVal,IfThen(trKL*KaSteepness > 
       20 + KaSteepness*KaTransitionVal,trKL,KaTransitionVal + log(1 + 
-      exp(KaSteepness*(trKL - KaTransitionVal)))*pow(KaSteepness,-1))),trKL);
+      exp(KaSteepness*(trKL - 
+      KaTransitionVal)))*pow(KaSteepness,-1))),trKL));
     
     KtransitionL = -fmax(-KtransitionL,Ka);
     

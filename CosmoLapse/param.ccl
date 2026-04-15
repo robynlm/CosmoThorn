@@ -82,6 +82,7 @@ CCTK_INT KaExpression "d/dt alpha = - alpha^2 f(alpha) (Ka - Kb)" STEERABLE=ALWA
 {
   0 :: "Ka = K"
   1 :: "Ka = Softplus: Ln[1 + Exp[S (K - T)]] / S + T"
+  2 :: "Ka = exp(-alpha) K"
 } 0
 
 restricted:

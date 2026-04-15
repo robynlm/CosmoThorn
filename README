@@ -24,7 +24,7 @@ gauge
 . fBM = fBMa + fBMb alpha^fBMc
 with user defined "fBMa", "fBMb", "fBMc"
 
-. Ka = [K, softplus]
+. Ka = [K, softplus, exp(-alpha) K]
 user chooses between them with "KaExpression"
 with softplus: Ln[1 + Exp[S (K - T)]] / S + T
 tuned with used defined S = "KaSteepness" and T = "KaTransition"
