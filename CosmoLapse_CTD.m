@@ -3,7 +3,7 @@
 SetEnhancedTimes[False];
 
 maxTimelevels = 4;
-thorn = "CosmoLapse";
+thorn = "CosmoLapse_CTD";
 
 (******************************************************************************)
 (*                                 Tensors                                    *)
@@ -13,8 +13,7 @@ Map [DefineTensor, {
   tau, dir, g, dpsim2, gucon, Ktransition,
   a, admdtalpha, mlbalpharhs, partialtalpha,
   b, admdtbeta, mlbbetarhs, partialtbeta, mlbB, mlbBrhs, partialtB,
-  mlbXt, mlbXtrhs,
-  rho, eps, press
+  mlbXt, mlbXtrhs
   }];
 
 Map [AssertSymmetricIncreasing, {g[la,lb]}];
@@ -50,7 +49,7 @@ DefineGroup1[name_, tensor_] :=
          group];
 
 inheritedImplementations =
-  {"ADMBase", "ML_BSSN", "Cactus", "LocalReduce", "HydroBase"};
+  {"ADMBase", "ML_BSSN", "Cactus", "LocalReduce"};
 
 ThornGroups = 
   {DefineGroup1["propertime", tau], DefineGroup1["Kthreshold", Ktransition]};
@@ -68,10 +67,7 @@ extraGroups = {
   {"ML_BSSN::ML_dtshiftrhs", {B1rhs, B2rhs, B3rhs}},
   {"ML_BSSN::ML_Gamma",      {Xt1, Xt2, Xt3}},
   {"ML_BSSN::ML_Gammarhs",   {Xt1rhs, Xt2rhs, Xt3rhs}},
-  {"ML_BSSN::ML_trace_curv", {trK}},
-  {"HydroBase::rho",         {rho}}, 
-  {"HydroBase::press",       {press}}, 
-  {"HydroBase::eps",         {eps}}
+  {"ML_BSSN::ML_trace_curv", {trK}}
   };
 
 declaredGroupNames = Map [First, ThornGroups];
@@ -143,27 +139,23 @@ Advection[LieDeriv_, b_, X_]:= IfThen[LieDeriv!=0,
 
 MasterCalc = {
     Shorthands -> {dir[ua],
-                   partialtalpha, Ka, KaTransitionVal, Kb, eosw, Kth, fBM,
+                   partialtalpha, Ka, KaTransitionVal, Kb, Kth, fBM,
                    detg, psi, psim2, dpsim2[la], gucon[ua,ub], eta,
                    partialtbeta[ua], partialtB[ua]},
     Equations -> {
         dir[ua] -> Sign[b[ua]],
         (* background extrinsic curvature *)
-        eosw -> press / (rho (1 + eps)),
-        Kth -> - 2.0 / (tau (1 + eosw)),
+        Kth -> - 2.0 / (tau),
       
         (***** alpha *****)
         fBM -> fBMa + fBMb a^fBMc,
         KaTransitionVal -> IfThen[KaTransitionExp==1, Ktransition, 
                                   KaTransition],
-        Ka -> IfThen[KaExpression==2, Exp[- a] bssntrK,
-                     IfThen[KaExpression==1, LnExp[bssntrK, KaSteepness, 
-                                                   KaTransitionVal], 
-                            bssntrK]],
+        Ka -> IfThen[KaExpression==1, LnExp[bssntrK, KaSteepness, KaTransitionVal], 
+                     bssntrK],
         Ktransition -> - Max[-Ktransition, Ka],
-        Kb -> IfThen[KbExpression==2, - Sqrt[24 Pi (rho (1 + eps))], 
-                     IfThen[KbExpression==1, Kth, 
-                            0.0]],
+        Kb -> IfThen[KbExpression==1, Kth, 
+                            0.0],
         partialtalpha  -> (- fBM (Ka - Kb) 
                            + Advection[alphaFullLieDeriv, b, a]),
         
@@ -394,8 +386,7 @@ intParameters = {
        Name -> KaExpression,
        Description -> "d/dt alpha = - f(alpha) (Ka - Kb)",
        AllowedValues -> {{Value -> 0, Description -> "Ka = K"},
-                         {Value -> 1, Description -> "Ka = Softplus: Ln[1 + Exp[S (K - T)]] / S + T"},
-                         {Value -> 2, Description -> "Ka = exp(-alpha) K"}},
+                         {Value -> 1, Description -> "Ka = Softplus: Ln[1 + Exp[S (K - T)]] / S + T"}},
        Steerable -> Always,
        Default -> 0
     },
@@ -411,8 +402,7 @@ intParameters = {
        Name -> KbExpression,
        Description -> "d/dt alpha = - f(alpha) (Ka - Kb)",
        AllowedValues -> {{Value -> 0, Description -> "Kb = 0.0"},
-                         {Value -> 1, Description -> "Kb = background_K: - 2 / (tau (1 + eosw))"},
-                         {Value -> 2, Description -> "Kb = - sqrt{ 24 pi rho (1 + eps) }"}},
+                         {Value -> 1, Description -> "Kb = background_K: - 2 / tau"}},
        Steerable -> Always,
        Default -> 0
     },

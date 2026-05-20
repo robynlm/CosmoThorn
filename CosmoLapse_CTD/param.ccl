@@ -1,0 +1,425 @@
+# File produced by Kranc
+
+
+shares: GenericFD
+
+USES CCTK_INT assume_stress_energy_state
+USES CCTK_INT assume_use_jacobian
+USES CCTK_STRING jacobian_group
+USES CCTK_STRING jacobian_determinant_group
+USES CCTK_STRING jacobian_inverse_group
+USES CCTK_STRING jacobian_derivative_group
+USES CCTK_INT jacobian_identity_map
+
+
+shares: MethodOfLines
+
+USES CCTK_INT MoL_Num_Evolved_Vars
+USES CCTK_INT MoL_Num_ArrayEvolved_Vars
+
+restricted:
+CCTK_INT verbose "verbose" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT other_timelevels "Number of active timelevels for non-evolved grid functions" STEERABLE=RECOVER
+{
+  0:4 :: ""
+} 1
+
+restricted:
+CCTK_REAL fBMa "f(alpha) = fBMa + fBMb alpha^fBMc" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0.
+
+restricted:
+CCTK_REAL fBMb "f(alpha) = fBMa + fBMb alpha^fBMc" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0.
+
+restricted:
+CCTK_REAL KaSteepness "Softplus steepness (S), only used if KaExpression = 1" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1.
+
+restricted:
+CCTK_REAL KaTransition "Softplus transition (T), only used if KaExpression = 1" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0.
+
+restricted:
+CCTK_REAL betaXi1 "d/dt beta = Xi_1 B^i" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0.
+
+restricted:
+CCTK_REAL betaXi2 "d/dt B = alpha^P Xi_2 d/dt Xt^i - Eta B^i" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0.
+
+restricted:
+CCTK_REAL betaEta "d/dt B = alpha^P Xi_2 d/dt Xt^i - Eta B^i" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0.
+
+restricted:
+CCTK_INT fBMc "f(alpha) = fBMa + fBMb alpha^fBMc" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT KaExpression "d/dt alpha = - f(alpha) (Ka - Kb)" STEERABLE=ALWAYS
+{
+  0 :: "Ka = K"
+  1 :: "Ka = Softplus: Ln[1 + Exp[S (K - T)]] / S + T"
+} 0
+
+restricted:
+CCTK_INT KaTransitionExp "Softplus transition (T) expression, only used if KaExpression = 1" STEERABLE=ALWAYS
+{
+  0 :: "T = Katransition"
+  1 :: "T = Katransition then updated as = - max(-T, Ka)"
+} 0
+
+restricted:
+CCTK_INT KbExpression "d/dt alpha = - f(alpha) (Ka - Kb)" STEERABLE=ALWAYS
+{
+  0 :: "Kb = 0.0"
+  1 :: "Kb = background_K: - 2 / tau"
+} 0
+
+restricted:
+CCTK_INT betaP "d/dt B = alpha^P Xi d/dt Xt^i - Eta B^i" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT varyingEta "Varying eta parameter in shift condition" STEERABLE=ALWAYS
+{
+  0 :: "eta = betaEta"
+  1 :: "eta = betaEta * Eq 4 of https://arxiv.org/pdf/0912.3125"
+} 0
+
+restricted:
+CCTK_INT alphaFullLieDeriv "Include Lie derivative advection terms, beta^k partial_k term in lapse evo" STEERABLE=ALWAYS
+{
+  0 :: "no, off"
+  1 :: "yes, on"
+} 0
+
+restricted:
+CCTK_INT betaFullLieDeriv "Include Lie derivative advection terms, beta^k partial_k term in shift evo" STEERABLE=ALWAYS
+{
+  0 :: "no, off"
+  1 :: "yes, on"
+} 0
+
+restricted:
+CCTK_INT upwind "Use upwind differencing for Lie derivative advection terms" STEERABLE=ALWAYS
+{
+  0 :: "no, use centered schemes"
+  1 :: "yes, use upwind"
+} 0
+
+restricted:
+CCTK_INT fdOrder "Finite differencing order" STEERABLE=ALWAYS
+{
+  2 :: ""
+  4 :: ""
+  6 :: ""
+  8 :: ""
+} 4
+
+restricted:
+CCTK_INT tile_size "Loop tile size"
+{
+  *:* :: ""
+} -1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_MaxNumEvolvedVars "Number of evolved variables used by this thorn" ACCUMULATOR-BASE=MethodofLines::MoL_Num_Evolved_Vars STEERABLE=RECOVER
+{
+  2:2 :: "Number of evolved variables used by this thorn"
+} 2
+
+restricted:
+CCTK_INT CosmoLapse_CTD_MaxNumArrayEvolvedVars "Number of Array evolved variables used by this thorn" ACCUMULATOR-BASE=MethodofLines::MoL_Num_ArrayEvolved_Vars STEERABLE=RECOVER
+{
+  0:0 :: "Number of Array evolved variables used by this thorn"
+} 0
+
+restricted:
+CCTK_INT timelevels "Number of active timelevels" STEERABLE=RECOVER
+{
+  0:4 :: ""
+} 3
+
+restricted:
+CCTK_INT rhs_timelevels "Number of active RHS timelevels" STEERABLE=RECOVER
+{
+  0:4 :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtLapsePostStep_calc_every "CosmoLapse_CTD_dtLapsePostStep_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtLapsePostRHS_calc_every "CosmoLapse_CTD_dtLapsePostRHS_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtLapsePostStepBoundary_calc_every "CosmoLapse_CTD_dtLapsePostStepBoundary_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtLapsePostRHSBoundary_calc_every "CosmoLapse_CTD_dtLapsePostRHSBoundary_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtShiftPostStep_calc_every "CosmoLapse_CTD_dtShiftPostStep_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtShiftPostRHS_calc_every "CosmoLapse_CTD_dtShiftPostRHS_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtShiftPostStepBoundary_calc_every "CosmoLapse_CTD_dtShiftPostStepBoundary_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtShiftPostRHSBoundary_calc_every "CosmoLapse_CTD_dtShiftPostRHSBoundary_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_InitialTau_calc_every "CosmoLapse_CTD_InitialTau_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_InitRHSTau_calc_every "CosmoLapse_CTD_InitRHSTau_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_RHSTau_calc_every "CosmoLapse_CTD_RHSTau_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtLapsePostStep_calc_offset "CosmoLapse_CTD_dtLapsePostStep_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtLapsePostRHS_calc_offset "CosmoLapse_CTD_dtLapsePostRHS_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtLapsePostStepBoundary_calc_offset "CosmoLapse_CTD_dtLapsePostStepBoundary_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtLapsePostRHSBoundary_calc_offset "CosmoLapse_CTD_dtLapsePostRHSBoundary_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtShiftPostStep_calc_offset "CosmoLapse_CTD_dtShiftPostStep_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtShiftPostRHS_calc_offset "CosmoLapse_CTD_dtShiftPostRHS_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtShiftPostStepBoundary_calc_offset "CosmoLapse_CTD_dtShiftPostStepBoundary_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT CosmoLapse_CTD_dtShiftPostRHSBoundary_calc_offset "CosmoLapse_CTD_dtShiftPostRHSBoundary_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT CosmoLapse_CTD_InitialTau_calc_offset "CosmoLapse_CTD_InitialTau_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT CosmoLapse_CTD_InitRHSTau_calc_offset "CosmoLapse_CTD_InitRHSTau_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT CosmoLapse_CTD_RHSTau_calc_offset "CosmoLapse_CTD_RHSTau_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+private:
+CCTK_KEYWORD tau_bound "Boundary condition to implement" STEERABLE=ALWAYS
+{
+  "flat" :: "Flat boundary condition"
+  "none" :: "No boundary condition"
+  "static" :: "Boundaries held fixed"
+  "radiative" :: "Radiation boundary condition"
+  "scalar" :: "Dirichlet boundary condition"
+  "newrad" :: "Improved radiative boundary condition"
+  "skip" :: "skip boundary condition code"
+} "skip"
+
+private:
+CCTK_KEYWORD Ktransition_bound "Boundary condition to implement" STEERABLE=ALWAYS
+{
+  "flat" :: "Flat boundary condition"
+  "none" :: "No boundary condition"
+  "static" :: "Boundaries held fixed"
+  "radiative" :: "Radiation boundary condition"
+  "scalar" :: "Dirichlet boundary condition"
+  "newrad" :: "Improved radiative boundary condition"
+  "skip" :: "skip boundary condition code"
+} "skip"
+
+private:
+CCTK_KEYWORD propertime_bound "Boundary condition to implement" STEERABLE=ALWAYS
+{
+  "flat" :: "Flat boundary condition"
+  "none" :: "No boundary condition"
+  "static" :: "Boundaries held fixed"
+  "radiative" :: "Radiation boundary condition"
+  "scalar" :: "Dirichlet boundary condition"
+  "newrad" :: "Improved radiative boundary condition"
+  "skip" :: "skip boundary condition code"
+} "none"
+
+private:
+CCTK_KEYWORD Kthreshold_bound "Boundary condition to implement" STEERABLE=ALWAYS
+{
+  "flat" :: "Flat boundary condition"
+  "none" :: "No boundary condition"
+  "static" :: "Boundaries held fixed"
+  "radiative" :: "Radiation boundary condition"
+  "scalar" :: "Dirichlet boundary condition"
+  "newrad" :: "Improved radiative boundary condition"
+  "skip" :: "skip boundary condition code"
+} "none"
+
+private:
+CCTK_REAL tau_bound_speed "characteristic speed at boundary" STEERABLE=ALWAYS
+{
+  0:* :: "outgoing characteristic speed > 0"
+} 1.
+
+private:
+CCTK_REAL Ktransition_bound_speed "characteristic speed at boundary" STEERABLE=ALWAYS
+{
+  0:* :: "outgoing characteristic speed > 0"
+} 1.
+
+private:
+CCTK_REAL propertime_bound_speed "characteristic speed at boundary" STEERABLE=ALWAYS
+{
+  0:* :: "outgoing characteristic speed > 0"
+} 1.
+
+private:
+CCTK_REAL Kthreshold_bound_speed "characteristic speed at boundary" STEERABLE=ALWAYS
+{
+  0:* :: "outgoing characteristic speed > 0"
+} 1.
+
+private:
+CCTK_REAL tau_bound_limit "limit value for r -> infinity" STEERABLE=ALWAYS
+{
+  *:* :: "value of limit value is unrestricted"
+} 0.
+
+private:
+CCTK_REAL Ktransition_bound_limit "limit value for r -> infinity" STEERABLE=ALWAYS
+{
+  *:* :: "value of limit value is unrestricted"
+} 0.
+
+private:
+CCTK_REAL propertime_bound_limit "limit value for r -> infinity" STEERABLE=ALWAYS
+{
+  *:* :: "value of limit value is unrestricted"
+} 0.
+
+private:
+CCTK_REAL Kthreshold_bound_limit "limit value for r -> infinity" STEERABLE=ALWAYS
+{
+  *:* :: "value of limit value is unrestricted"
+} 0.
+
+private:
+CCTK_REAL tau_bound_scalar "Dirichlet boundary value" STEERABLE=ALWAYS
+{
+  *:* :: "unrestricted"
+} 0.
+
+private:
+CCTK_REAL Ktransition_bound_scalar "Dirichlet boundary value" STEERABLE=ALWAYS
+{
+  *:* :: "unrestricted"
+} 0.
+
+private:
+CCTK_REAL propertime_bound_scalar "Dirichlet boundary value" STEERABLE=ALWAYS
+{
+  *:* :: "unrestricted"
+} 0.
+
+private:
+CCTK_REAL Kthreshold_bound_scalar "Dirichlet boundary value" STEERABLE=ALWAYS
+{
+  *:* :: "unrestricted"
+} 0.
+

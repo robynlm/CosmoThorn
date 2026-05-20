@@ -19,7 +19,7 @@ gauge
 
  ---- Lapse ----
 
- >> d(alpha)/dt = - alpha^2 fBM (Ka - Kb)
+ >> d(alpha)/dt = - fBM (Ka - Kb)
 
 . fBM = fBMa + fBMb alpha^fBMc
 with user defined "fBMa", "fBMb", "fBMc"
