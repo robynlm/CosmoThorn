@@ -54,6 +54,12 @@ CCTK_REAL KaTransition "Softplus transition (T), only used if KaExpression = 1" 
 } 0.
 
 restricted:
+CCTK_REAL KaTransitionFac "Softplus transition (T) factor when updated, only used if KaExpression = 1" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1.
+
+restricted:
 CCTK_REAL betaXi1 "d/dt beta = Xi_1 B^i" STEERABLE=ALWAYS
 {
   *:* :: ""
@@ -78,7 +84,7 @@ CCTK_INT fBMc "f(alpha) = fBMa + fBMb alpha^fBMc" STEERABLE=ALWAYS
 } 0
 
 restricted:
-CCTK_INT KaExpression "d/dt alpha = - alpha^2 f(alpha) (Ka - Kb)" STEERABLE=ALWAYS
+CCTK_INT KaExpression "d/dt alpha = - f(alpha) (Ka - Kb)" STEERABLE=ALWAYS
 {
   0 :: "Ka = K"
   1 :: "Ka = Softplus: Ln[1 + Exp[S (K - T)]] / S + T"
@@ -88,12 +94,12 @@ CCTK_INT KaExpression "d/dt alpha = - alpha^2 f(alpha) (Ka - Kb)" STEERABLE=ALWA
 restricted:
 CCTK_INT KaTransitionExp "Softplus transition (T) expression, only used if KaExpression = 1" STEERABLE=ALWAYS
 {
-  0 :: "T = Katransition"
-  1 :: "T = Katransition then updated as = - max(-T, Ka)"
+  0 :: "T = KaTransition"
+  1 :: "T = KaTransition then updated as = - max(-T, KaTransitionFac Ka)"
 } 0
 
 restricted:
-CCTK_INT KbExpression "d/dt alpha = - alpha^2 f(alpha) (Ka - Kb)" STEERABLE=ALWAYS
+CCTK_INT KbExpression "d/dt alpha = - f(alpha) (Ka - Kb)" STEERABLE=ALWAYS
 {
   0 :: "Kb = 0.0"
   1 :: "Kb = background_K: - 2 / (tau (1 + eosw))"

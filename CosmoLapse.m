@@ -160,7 +160,7 @@ MasterCalc = {
                      IfThen[KaExpression==1, LnExp[bssntrK, KaSteepness, 
                                                    KaTransitionVal], 
                             bssntrK]],
-        Ktransition -> - Max[-Ktransition, Ka],
+        Ktransition -> - Max[-Ktransition, KaTransitionFac Ka],
         Kb -> IfThen[KbExpression==2, - Sqrt[24 Pi (rho (1 + eps))], 
                      IfThen[KbExpression==1, Kth, 
                             0.0]],
@@ -365,6 +365,12 @@ realParameters = {
         Default -> 0.0
     },
     {
+        Name -> KaTransitionFac,
+        Description -> "Softplus transition (T) factor when updated, only used if KaExpression = 1",
+        Steerable -> Always,
+        Default -> 1.0
+    },
+    {
         Name -> betaXi1,
         Description -> "d/dt beta = Xi_1 B^i",
         Steerable -> Always,
@@ -402,8 +408,8 @@ intParameters = {
     {
        Name -> KaTransitionExp,
        Description -> "Softplus transition (T) expression, only used if KaExpression = 1",
-       AllowedValues -> {{Value -> 0, Description -> "T = Katransition"},
-                         {Value -> 1, Description -> "T = Katransition then updated as = - max(-T, Ka)"}},
+       AllowedValues -> {{Value -> 0, Description -> "T = KaTransition"},
+                         {Value -> 1, Description -> "T = KaTransition then updated as = - max(-T, KaTransitionFac Ka)"}},
        Steerable -> Always,
        Default -> 0
     },

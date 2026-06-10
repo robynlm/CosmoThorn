@@ -369,18 +369,17 @@ static void CosmoLapse_dtLapsePostRHS_Body(const cGH* restrict const cctkGH, con
       exp(KaSteepness*(trKL - 
       KaTransitionVal)))*pow(KaSteepness,-1))),trKL));
     
-    KtransitionL = -fmax(-KtransitionL,Ka);
+    KtransitionL = -fmax(-KtransitionL,Ka*KaTransitionFac);
     
     CCTK_REAL Kb CCTK_ATTRIBUTE_UNUSED = IfThen(KbExpression == 
       2,-8.6832150546992119123561755275*pow((1 + 
       epsL)*rhoL,0.5),IfThen(KbExpression == 1,Kth,0.));
     
-    CCTK_REAL partialtalpha CCTK_ATTRIBUTE_UNUSED = 
+    CCTK_REAL partialtalpha CCTK_ATTRIBUTE_UNUSED = fBM*(-Ka + Kb) + 
       IfThen(alphaFullLieDeriv != 0,IfThen(upwind == 
       1,betaxL*JacPDupwindNthAnti1alp + betayL*JacPDupwindNthAnti2alp + 
       betazL*JacPDupwindNthAnti3alp,betaxL*JacPDstandardNth1alp + 
-      betayL*JacPDstandardNth2alp + betazL*JacPDstandardNth3alp),0) + 
-      fBM*(-Ka + Kb)*pow(alpL,2);
+      betayL*JacPDstandardNth2alp + betazL*JacPDstandardNth3alp),0);
     
     CCTK_REAL dtalpL CCTK_ATTRIBUTE_UNUSED = partialtalpha;
     

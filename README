@@ -28,7 +28,8 @@ with user defined "fBMa", "fBMb", "fBMc"
 user chooses between them with "KaExpression"
 with softplus: Ln[1 + Exp[S (K - T)]] / S + T
 tuned with used defined S = "KaSteepness" and T = "KaTransition"
- '-> T is updated to be = - max(-T, Ka) if "KaTransitionExp" = 1
+ '-> T is updated to be = - KaTransitionFac max(-T, Ka) if "KaTransitionExp" = 1
+with KaTransitionFac a real
 
 . Kb = [0, Kth, - sqrt(24 pi rho (1 + eps))]
 user chooses between them with "KbExpression"
