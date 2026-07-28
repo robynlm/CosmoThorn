@@ -10,7 +10,7 @@ authors:
     email: robyn.munoz@yahoo.fr
     orcid: 'https://orcid.org/0000-0003-3345-8520'
     affiliation: University of Sussex
-repository-code: 'https://github.com/robynlm/AddRefinements'
+repository-code: 'https://github.com/robynlm/CosmoThorn'
 abstract: >-
   This is an Einstein Toolkit thorn to calculate proper time and implement cosmologically motivated lapse and shift evolution equations. It uses Kranc to be generated.
 keywords:
