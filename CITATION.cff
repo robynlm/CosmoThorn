@@ -5,15 +5,14 @@ message: >-
   metadata from this file.
 type: software
 authors:
-  - given-names: 'Robyn '
+  - given-names: Robyn
     family-names: Munoz
     email: robyn.munoz@yahoo.fr
+    affiliation: Univeristy of Sussex
     orcid: 'https://orcid.org/0000-0003-3345-8520'
-    affiliation: University of Sussex
 repository-code: 'https://github.com/robynlm/CosmoThorn'
 abstract: >-
-  This is an Einstein Toolkit thorn to calculate proper time and implement cosmologically motivated lapse and shift evolution equations. It uses Kranc to be generated.
-keywords:
-  - 
+  This is an Einstein Toolkit thorn to calculate proper time
+  and implement cosmologically motivated lapse and shift
+  evolution equations. It uses Kranc to be generated.
 license: GPL-3.0-or-later
-date-released: ''
